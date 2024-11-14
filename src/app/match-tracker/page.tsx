@@ -44,9 +44,7 @@ export default function About() {
   useEffect(() => {
     const getRemainingMatches = async () => {
       try {
-        const resp = await axios.get(
-          `${process.env.API_BASE_URL}/api/match-tracker`
-        );
+        const resp = await axios.get('/api/match');
         setMatches(resp.data.data);
         setIsLoading(false);
       } catch (error) {
@@ -191,7 +189,7 @@ export default function About() {
     const uploadScore = async () => {
       try {
         setIsUploading(true);
-        await axios.post(`${process.env.API_BASE_URL}/match`, body);
+        await axios.post('/api/match', body);
         setResetCountdown(3);
       } catch (error) {
         console.log('Error', error);
