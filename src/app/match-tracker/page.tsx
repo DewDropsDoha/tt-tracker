@@ -37,14 +37,16 @@ export default function About() {
   const handleMatchSelection = (value: string) => {
     setSelectedMatch(value);
     const players = value.split('vs');
-    setPlayer1(players[0].trim());
-    setPlayer2(players[1].trim());
+    setPlayer1(players[0]?.trim());
+    setPlayer2(players[1]?.trim());
   };
 
   useEffect(() => {
     const getRemainingMatches = async () => {
       try {
-        const resp = await axios.get(`${process.env.API_BASE_URL}/match`);
+        const resp = await axios.get(
+          `${process.env.API_BASE_URL}/api/match-tracker`
+        );
         setMatches(resp.data.data);
         setIsLoading(false);
       } catch (error) {
@@ -201,7 +203,12 @@ export default function About() {
     uploadScore();
   };
 
-  if (isLoading) return <div className='pt-8'><Loading /></div>;
+  if (isLoading)
+    return (
+      <div className="pt-8">
+        <Loading />
+      </div>
+    );
 
   return (
     <div className="flex items-center justify-center bg-[#f2f5fa] text-[#333] h-screen m-0">
