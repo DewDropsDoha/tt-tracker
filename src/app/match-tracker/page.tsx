@@ -321,7 +321,7 @@ export default function About() {
                 className="flex items-center justify-center"
                 onClick={switchPlayerSide}
               >
-                <div>
+                <div className="cursor-pointer">
                   <FaArrowCircleLeft />
                   <FaArrowCircleRight />
                 </div>
