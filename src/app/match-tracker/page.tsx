@@ -2,6 +2,7 @@
 
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import {
   FaTableTennis,
   FaMinusSquare,
@@ -10,7 +11,7 @@ import {
 } from 'react-icons/fa';
 import Loading from './Loading';
 import CountdownTimer from './CountdownTimer';
-import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
+import ReactSelect from '../components/ReactSelect/ReactSelect';
 
 function MatchTracker() {
   const [player1, setPlayer1] = useState('');
@@ -213,23 +214,13 @@ function MatchTracker() {
     <div className="flex items-center justify-center bg-[#f2f5fa] text-[#333] h-screen m-0">
       <div className="bg-white rounded-lg shadow-lg p-8 max-w-[500px] text-center overflow-hidden">
         <div className="text-xl pb-4">Table Tennis Match Tracker</div>
-
         {!isMatchActive && !winnerMessage && (
-          <div>
-            <select
-              className="p-2 my-4 text-normal border border-gray-300 rounded-md w-full focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
-              onChange={(e) => handleMatchSelection(e.target.value)}
-              value={selectedMatch}
-            >
-              <option key="match-dropdown" value="">
-                Select Match
-              </option>
-              {matches.map((name) => (
-                <option key={name} value={name}>
-                  {name}
-                </option>
-              ))}
-            </select>
+          <div className="mb-2">
+            <ReactSelect
+              matches={matches}
+              handleMatchSelection={handleMatchSelection}
+              selectedMatch={selectedMatch}
+            />
           </div>
         )}
 
