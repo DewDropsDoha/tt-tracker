@@ -329,20 +329,26 @@ function MatchTracker() {
             </div>
           </div>
 
-          <div
-            hidden={!isMatchActive}
-            className="flex justify-between items-center p-2.5"
-          >
-            <FaMinusSquare
-              size={28}
-              style={{ color: playerColors.player1, paddingBottom: '4px' }}
-              onClick={handleDecreaseScore1}
-            />
-            <FaMinusSquare
-              size={28}
-              style={{ color: playerColors.player2, paddingBottom: '4px' }}
-              onClick={handleDecreaseScore2}
-            />
+          <div hidden={!isMatchActive} className="h-12">
+            {player1Stats[serve.length - 1] === 1 && (
+              <div className="flex justify-start items-center p-2.5">
+                <FaMinusSquare
+                  size={28}
+                  style={{ color: playerColors.player1, paddingBottom: '4px' }}
+                  onClick={handleDecreaseScore1}
+                />
+              </div>
+            )}
+
+            {player2Stats[serve.length - 1] === 1 && (
+              <div className="flex justify-end items-center p-2.5">
+                <FaMinusSquare
+                  size={28}
+                  style={{ color: playerColors.player2, paddingBottom: '4px' }}
+                  onClick={handleDecreaseScore2}
+                />
+              </div>
+            )}
           </div>
         </div>
 
