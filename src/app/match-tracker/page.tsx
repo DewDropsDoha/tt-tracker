@@ -46,7 +46,7 @@ function MatchTracker() {
     const getRemainingMatches = async () => {
       try {
         const resp = await axios.get('/api/match');
-        setMatches(resp.data.data);
+        setMatches(resp.data);
         setIsLoading(false);
       } catch (error) {
         console.log('Error', error);
@@ -260,7 +260,7 @@ function MatchTracker() {
                 </table>
               </div>
 
-              {!resetCountdown && (
+              {!resetCountdown && winnerMessage && (
                 <button
                   onClick={uploadScore}
                   className="bg-green-600 text-white w-full font-semibold py-2 px-6 my-2 rounded-md shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed"
@@ -277,22 +277,17 @@ function MatchTracker() {
                 </button>
               )}
 
-              {resetCountdown && (
-                <div className="controls">
-                  <button
-                    onClick={uploadScore}
-                    className="control-button start"
-                  >
-                    <p>
-                      Uploaded successfully! <br />
-                      Resetting in{' '}
-                      <CountdownTimer
-                        countdown={resetCountdown}
-                        onFinish={resetMatch}
-                      />{' '}
-                      seconds ...
-                    </p>
-                  </button>
+              {resetCountdown !== 0 && winnerMessage && (
+                <div className="bg-green-600 text-white w-full py-2 px-6 my-2 rounded-md shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed">
+                  <p>
+                    Uploaded successfully! <br />
+                    Resetting in{' '}
+                    <CountdownTimer
+                      countdown={resetCountdown}
+                      onFinish={resetMatch}
+                    />{' '}
+                    seconds ...
+                  </p>
                 </div>
               )}
             </>
