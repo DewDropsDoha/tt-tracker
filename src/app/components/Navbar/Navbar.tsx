@@ -1,4 +1,6 @@
+import Link from 'next/link';
 import React, { Fragment, useEffect, useState } from 'react';
+import { useUser } from '@auth0/nextjs-auth0/client';
 import {
   Navbar,
   Collapse,
@@ -29,7 +31,7 @@ function TrackerMenu() {
         <MenuHandler>
           <Typography as="div" variant="small" className="font-medium">
             <ListItem
-              className="flex items-center gap-2 py-2 pr-4 font-medium text-gray-900"
+              className="flex items-center gap-2 py-2 pr-4 font-medium text-black bg-transparent"
               selected={isMenuOpen || isMobileMenuOpen}
               onClick={() => setIsMobileMenuOpen((cur) => !cur)}
             >
@@ -49,7 +51,7 @@ function TrackerMenu() {
             </ListItem>
           </Typography>
         </MenuHandler>
-        <MenuList className="hidden rounded-xl lg:block">
+        <MenuList className="hidden rounded-xl lg:block text-black">
           <MenuItem>Single</MenuItem>
           <MenuItem>Single Quarterfinal</MenuItem>
           <MenuItem>Single Semifinal</MenuItem>
@@ -59,7 +61,7 @@ function TrackerMenu() {
           <MenuItem>Double Final</MenuItem>
         </MenuList>
       </Menu>
-      <div className="block lg:hidden">
+      <div className="block lg:hidden text-black">
         <Collapse open={isMobileMenuOpen}>
           <MenuItem>Single</MenuItem>
           <MenuItem>Single Quarterfinal</MenuItem>
@@ -89,7 +91,7 @@ function RankingMenu() {
         <MenuHandler>
           <Typography as="div" variant="small" className="font-medium">
             <ListItem
-              className="flex items-center gap-2 py-2 pr-4 font-medium text-gray-900"
+              className="flex items-center gap-2 py-2 pr-4 font-medium text-black bg-transparent"
               selected={isMenuOpen || isMobileMenuOpen}
               onClick={() => setIsMobileMenuOpen((cur) => !cur)}
             >
@@ -109,12 +111,12 @@ function RankingMenu() {
             </ListItem>
           </Typography>
         </MenuHandler>
-        <MenuList className="hidden rounded-xl lg:block">
+        <MenuList className="hidden rounded-xl lg:block text-black">
           <MenuItem>Single</MenuItem>
           <MenuItem>Double</MenuItem>
         </MenuList>
       </Menu>
-      <div className="block lg:hidden">
+      <div className="block lg:hidden text-black">
         <Collapse open={isMobileMenuOpen}>
           <MenuItem>Single</MenuItem>
           <MenuItem>Double</MenuItem>
@@ -134,6 +136,7 @@ function NavList() {
 }
 
 export function TableTennisNavbar() {
+  const { user } = useUser();
   const [openNav, setOpenNav] = useState(false);
 
   useEffect(() => {
@@ -143,25 +146,30 @@ export function TableTennisNavbar() {
     );
   }, []);
 
+  const AuthButton = user ? (
+    <Link href="/api/auth/logout">
+      <Button variant="outlined" size="sm" fullWidth>
+        Log Out
+      </Button>
+    </Link>
+  ) : (
+    <Link href="/api/auth/login">
+      <Button variant="outlined" size="sm" fullWidth>
+        Log In
+      </Button>
+    </Link>
+  );
+
   return (
     <Navbar className="sticky h-max max-w-full rounded-none px-4 py-2 lg:px-8 lg:py-4">
-      <div className="flex items-center justify-between text-blue-gray-900">
-        <Typography
-          as="a"
-          href="#"
-          variant="h6"
-          className="mr-4 cursor-pointer py-1.5 lg:ml-2"
-        >
+      <div className="flex items-center justify-between text-black">
+        <div className="mr-4 cursor-pointer py-1.5 lg:ml-2 text-xl">
           Table Tennis Match Tracker
-        </Typography>
+        </div>
         <div className="hidden lg:block ml-auto">
           <NavList />
         </div>
-        <div className="hidden gap-2 lg:flex">
-          <Button variant="outlined" size="sm">
-            Log In
-          </Button>
-        </div>
+        <div className="hidden gap-2 lg:flex">{AuthButton}</div>
         <IconButton
           variant="text"
           className="lg:hidden"
@@ -177,9 +185,7 @@ export function TableTennisNavbar() {
       <Collapse open={openNav}>
         <NavList />
         <div className="flex w-full flex-nowrap items-center gap-2 lg:hidden">
-          <Button variant="outlined" size="sm" fullWidth>
-            Log In
-          </Button>
+          {AuthButton}
         </div>
       </Collapse>
     </Navbar>

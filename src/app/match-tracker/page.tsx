@@ -10,8 +10,9 @@ import {
 } from 'react-icons/fa';
 import Loading from './Loading';
 import CountdownTimer from './CountdownTimer';
+import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 
-export default function About() {
+function MatchTracker() {
   const [player1, setPlayer1] = useState('');
   const [player2, setPlayer2] = useState('');
   const [score1, setScore1] = useState(0);
@@ -381,3 +382,7 @@ export default function About() {
     </div>
   );
 }
+
+export default withPageAuthRequired(MatchTracker, {
+  returnTo: '/',
+});

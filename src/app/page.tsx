@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <div>
       <Navbar />
-      <div className="flex flex-col items-center justify-center  p-8 font-[family-name:var(--font-geist-sans)]">
+      <div className="flex flex-col items-center justify-center p-8">
         <div className="text-5xl">Table Tennis Tracker</div>
 
         <Link href="/match-tracker">
