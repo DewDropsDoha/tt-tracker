@@ -12,6 +12,7 @@ import {
 import Loading from './Loading';
 import CountdownTimer from './CountdownTimer';
 import ReactSelect from '../components/ReactSelect/ReactSelect';
+import MatchTimer from '../components/Timer';
 
 function MatchTracker() {
   const [player1, setPlayer1] = useState('');
@@ -204,18 +205,27 @@ function MatchTracker() {
     );
 
   return (
-    <div className="flex items-center justify-center bg-[#f2f5fa] text-[#333] h-screen m-0">
-      <div className="bg-white rounded-lg shadow-lg p-8 max-w-[500px] text-center overflow-hidden">
-        <div className="text-xl pb-4">Table Tennis Match Tracker</div>
-        {!isMatchActive && !winnerMessage && (
-          <div className="mb-2">
-            <ReactSelect
-              matches={matches}
-              handleMatchSelection={handleMatchSelection}
-              selectedMatch={selectedMatch}
-            />
-          </div>
-        )}
+    <div className="flex items-center justify-center mt-4">
+      <div className="rounded-lg shadow-2xl p-8 text-center overflow-hidden">
+        <div className="text-xl pb-4">Match Score Tracker</div>
+
+        <div className="h-12">
+          {!isMatchActive && !winnerMessage && (
+            <div className="mb-2">
+              <ReactSelect
+                matches={matches}
+                handleMatchSelection={handleMatchSelection}
+                selectedMatch={selectedMatch}
+              />
+            </div>
+          )}
+
+          {isMatchActive && !winnerMessage && (
+            <div className="pt-2">
+              Timer: <MatchTimer isActive={isMatchActive} />
+            </div>
+          )}
+        </div>
 
         <div>
           <div className="pb-4 text-lg">Score</div>
@@ -322,24 +332,34 @@ function MatchTracker() {
             </div>
           </div>
 
-          <div hidden={!isMatchActive} className="h-12">
-            {player1Stats[serve.length - 1] === 1 && (
-              <div className="flex justify-start items-center p-2.5">
-                <FaMinusSquare
-                  size={28}
-                  style={{ color: playerColors.player1, paddingBottom: '4px' }}
-                  onClick={handleDecreaseScore1}
-                />
-              </div>
-            )}
+          <div className="h-12">
+            {!isMatchActive && (
+              <div>
+                {player1Stats[serve.length - 1] === 1 && (
+                  <div className="flex justify-start items-center p-2.5">
+                    <FaMinusSquare
+                      size={28}
+                      style={{
+                        color: playerColors.player1,
+                        paddingBottom: '4px',
+                      }}
+                      onClick={handleDecreaseScore1}
+                    />
+                  </div>
+                )}
 
-            {player2Stats[serve.length - 1] === 1 && (
-              <div className="flex justify-end items-center p-2.5">
-                <FaMinusSquare
-                  size={28}
-                  style={{ color: playerColors.player2, paddingBottom: '4px' }}
-                  onClick={handleDecreaseScore2}
-                />
+                {player2Stats[serve.length - 1] === 1 && (
+                  <div className="flex justify-end items-center p-2.5">
+                    <FaMinusSquare
+                      size={28}
+                      style={{
+                        color: playerColors.player2,
+                        paddingBottom: '4px',
+                      }}
+                      onClick={handleDecreaseScore2}
+                    />
+                  </div>
+                )}
               </div>
             )}
           </div>
