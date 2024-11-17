@@ -18,7 +18,7 @@ import {
 } from './../MTailwind';
 import { FaChevronDown, FaBars } from 'react-icons/fa';
 
-function TrackerMenu() {
+function TrackerMenu({ closeMobileNav }: { closeMobileNav: () => void }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -54,35 +54,35 @@ function TrackerMenu() {
           </Typography>
         </MenuHandler>
         <MenuList className="hidden rounded-xl lg:block text-black">
-          <MenuItem>
+          <MenuItem onClick={closeMobileNav}>
             <Link href="/match-tracker">Single</Link>
           </MenuItem>
-          <MenuItem>Single Quarterfinal</MenuItem>
-          <MenuItem>Single Semifinal</MenuItem>
-          <MenuItem>Single Final</MenuItem>
-          <MenuItem>Double</MenuItem>
-          <MenuItem>Double Semifinal</MenuItem>
-          <MenuItem>Double Final</MenuItem>
+          <MenuItem onClick={closeMobileNav}>Single Quarterfinal</MenuItem>
+          <MenuItem onClick={closeMobileNav}>Single Semifinal</MenuItem>
+          <MenuItem onClick={closeMobileNav}>Single Final</MenuItem>
+          <MenuItem onClick={closeMobileNav}>Double</MenuItem>
+          <MenuItem onClick={closeMobileNav}>Double Semifinal</MenuItem>
+          <MenuItem onClick={closeMobileNav}>Double Final</MenuItem>
         </MenuList>
       </Menu>
       <div className="block lg:hidden text-black">
         <Collapse open={isMobileMenuOpen}>
-          <MenuItem>
+          <MenuItem onClick={closeMobileNav}>
             <Link href="/match-tracker">Single</Link>
           </MenuItem>
-          <MenuItem>Single Quarterfinal</MenuItem>
-          <MenuItem>Single Semifinal</MenuItem>
-          <MenuItem>Single Final</MenuItem>
-          <MenuItem>Double</MenuItem>
-          <MenuItem>Double Semifinal</MenuItem>
-          <MenuItem>Double Final</MenuItem>
+          <MenuItem onClick={closeMobileNav}>Single Quarterfinal</MenuItem>
+          <MenuItem onClick={closeMobileNav}>Single Semifinal</MenuItem>
+          <MenuItem onClick={closeMobileNav}>Single Final</MenuItem>
+          <MenuItem onClick={closeMobileNav}>Double</MenuItem>
+          <MenuItem onClick={closeMobileNav}>Double Semifinal</MenuItem>
+          <MenuItem onClick={closeMobileNav}>Double Final</MenuItem>
         </Collapse>
       </div>
     </Fragment>
   );
 }
 
-function RankingMenu() {
+function RankingMenu({ closeMobileNav }: { closeMobileNav: () => void }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -118,20 +118,20 @@ function RankingMenu() {
           </Typography>
         </MenuHandler>
         <MenuList className="hidden rounded-xl lg:block text-black">
-          <MenuItem>
+          <MenuItem onClick={closeMobileNav}>
             <Link href="/">Single</Link>
           </MenuItem>
-          <MenuItem>
+          <MenuItem onClick={closeMobileNav}>
             <Link href="/">Double</Link>
           </MenuItem>
         </MenuList>
       </Menu>
       <div className="block lg:hidden text-black">
         <Collapse open={isMobileMenuOpen}>
-          <MenuItem>
+          <MenuItem onClick={closeMobileNav}>
             <Link href="/">Single</Link>
           </MenuItem>
-          <MenuItem>
+          <MenuItem onClick={closeMobileNav}>
             <Link href="/">Double</Link>
           </MenuItem>
         </Collapse>
@@ -140,11 +140,11 @@ function RankingMenu() {
   );
 }
 
-function NavList() {
+function NavList({ closeMobileNav }: { closeMobileNav: () => void }) {
   return (
     <List className="mb-6 mt-4 p-0 lg:mb-0 lg:mt-0 lg:flex-row lg:p-1">
-      <RankingMenu />
-      <TrackerMenu />
+      <RankingMenu closeMobileNav={closeMobileNav} />
+      <TrackerMenu closeMobileNav={closeMobileNav} />
     </List>
   );
 }
@@ -159,6 +159,8 @@ export function TableTennisNavbar() {
       () => window.innerWidth >= 960 && setOpenNav(false)
     );
   }, []);
+
+  const closeMobileNav = () => setOpenNav(false);
 
   const AuthButton = user ? (
     <Link href="/api/auth/logout">
@@ -183,7 +185,7 @@ export function TableTennisNavbar() {
           </Link>
         </div>
         <div className="hidden lg:block ml-auto">
-          <NavList />
+          <NavList closeMobileNav={closeMobileNav} />
         </div>
         <div className="hidden gap-2 lg:flex">{AuthButton}</div>
         <IconButton
@@ -199,7 +201,7 @@ export function TableTennisNavbar() {
         </IconButton>
       </div>
       <Collapse open={openNav}>
-        <NavList />
+        <NavList closeMobileNav={closeMobileNav} />
         <div className="flex w-full flex-nowrap items-center gap-2 lg:hidden">
           {AuthButton}
         </div>
