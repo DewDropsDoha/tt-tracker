@@ -25,7 +25,6 @@ function MatchTracker() {
   const [winnerMessage, setWinnerMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isUploading, setIsUploading] = useState(false);
-  const [clickCount, setClickCount] = useState(0);
   const [matches, setMatches] = useState<string[]>([]);
   const [selectedMatch, setSelectedMatch] = useState('');
   const [resetCountdown, setResetCountdown] = useState(0);
@@ -70,7 +69,6 @@ function MatchTracker() {
     setIsMatchActive(true);
     setWinnerMessage('');
     setErrorMessage('');
-    setClickCount(0);
     setResetCountdown(0);
   };
 
@@ -84,7 +82,6 @@ function MatchTracker() {
     setIsMatchActive(false);
     setWinnerMessage('');
     setErrorMessage('');
-    setClickCount(0);
     setSelectedMatch('');
     setResetCountdown(0);
   };
@@ -119,7 +116,6 @@ function MatchTracker() {
     setScore1(score1 + 1);
     setPlayer1Stats((prev) => [...prev, 1]);
     setPlayer2Stats((prev) => [...prev, 0]);
-    setClickCount(clickCount + 1);
     setServe((prev) => {
       if (prev.length < 21) {
         if (prev.length % 2 === 0) {
@@ -141,7 +137,6 @@ function MatchTracker() {
     setScore2(score2 + 1);
     setPlayer1Stats((prev) => [...prev, 0]);
     setPlayer2Stats((prev) => [...prev, 1]);
-    setClickCount(clickCount + 1);
     setServe((prev) => {
       if (prev.length < 21) {
         if (prev.length % 2 === 0) {
@@ -160,7 +155,6 @@ function MatchTracker() {
     setScore1(score);
     setPlayer1Stats((prev) => prev.slice(0, -1));
     setPlayer2Stats((prev) => prev.slice(0, -1));
-    setClickCount(clickCount - 1);
     setServe((prev) => prev.slice(0, -1));
   };
 
@@ -170,7 +164,6 @@ function MatchTracker() {
     setScore2(score);
     setPlayer1Stats((prev) => prev.slice(0, -1));
     setPlayer2Stats((prev) => prev.slice(0, -1));
-    setClickCount(clickCount - 1);
     setServe((prev) => prev.slice(0, -1));
   };
 
