@@ -2,7 +2,6 @@
 
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
 import Loading from '../match-tracker/Loading';
 import { Card, Typography } from '@material-tailwind/react';
 
@@ -32,7 +31,7 @@ function Ranking() {
     const getRanking = async () => {
       try {
         const resp = await axios.get('/api/rank');
-        setTableRows(resp.data);
+        setTableRows(resp?.data ?? []);
         setIsLoading(false);
       } catch (error) {
         console.log('Error', error);
@@ -140,4 +139,4 @@ function Ranking() {
   );
 }
 
-export default withPageAuthRequired(Ranking);
+export default Ranking;
