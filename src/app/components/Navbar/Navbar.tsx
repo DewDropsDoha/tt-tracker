@@ -143,7 +143,7 @@ function RankingMenu({ closeMobileNav }: { closeMobileNav: () => void }) {
 function NavList({ closeMobileNav }: { closeMobileNav: () => void }) {
   return (
     <List className="mb-6 mt-4 p-0 lg:mb-0 lg:mt-0 lg:flex-row lg:p-1">
-      <RankingMenu closeMobileNav={closeMobileNav} />
+      {/* <RankingMenu closeMobileNav={closeMobileNav} /> */}
       <TrackerMenu closeMobileNav={closeMobileNav} />
     </List>
   );
