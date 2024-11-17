@@ -67,7 +67,9 @@ function TrackerMenu() {
       </Menu>
       <div className="block lg:hidden text-black">
         <Collapse open={isMobileMenuOpen}>
-          <MenuItem>Single</MenuItem>
+          <MenuItem>
+            <Link href="/match-tracker">Single</Link>
+          </MenuItem>
           <MenuItem>Single Quarterfinal</MenuItem>
           <MenuItem>Single Semifinal</MenuItem>
           <MenuItem>Single Final</MenuItem>
@@ -116,14 +118,22 @@ function RankingMenu() {
           </Typography>
         </MenuHandler>
         <MenuList className="hidden rounded-xl lg:block text-black">
-          <MenuItem>Single</MenuItem>
-          <MenuItem>Double</MenuItem>
+          <MenuItem>
+            <Link href="/">Single</Link>
+          </MenuItem>
+          <MenuItem>
+            <Link href="/">Double</Link>
+          </MenuItem>
         </MenuList>
       </Menu>
       <div className="block lg:hidden text-black">
         <Collapse open={isMobileMenuOpen}>
-          <MenuItem>Single</MenuItem>
-          <MenuItem>Double</MenuItem>
+          <MenuItem>
+            <Link href="/">Single</Link>
+          </MenuItem>
+          <MenuItem>
+            <Link href="/">Double</Link>
+          </MenuItem>
         </Collapse>
       </div>
     </Fragment>
