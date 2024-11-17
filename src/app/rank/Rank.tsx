@@ -51,20 +51,20 @@ function Ranking() {
 
   return (
     <div className="w-full h-full">
-      <div className="text-xl pb-4 text-white">Single 1st Round Ranking</div>
-      <Card className="overflow-auto bg-gray-500/50">
-        <table className="w-full min-w-max table-auto text-left text-white">
+      <div className="text-lg pb-4">Single 1st Round Ranking</div>
+      <Card className="overflow-auto">
+        <table className="w-full min-w-max table-auto text-left">
           <thead>
             <tr>
               {tableHeaders.map((head) => (
                 <th
                   key={head}
-                  className="border-b border-gray-600 bg-gray-700 p-4"
+                  className="border-b border-blue-gray-100 bg-blue-gray-50 p-4"
                 >
                   <Typography
                     variant="small"
-                    color="white"
-                    className="font-normal leading-none opacity-90"
+                    color="blue-gray"
+                    className="font-normal leading-none opacity-70"
                   >
                     {head}
                   </Typography>
@@ -75,11 +75,11 @@ function Ranking() {
           <tbody>
             {tableRows.map(
               ({ name, rank, win, lose, matchLeft, totalPlayed }) => (
-                <tr key={name} className="even:bg-gray-600">
+                <tr key={name} className="even:bg-blue-gray-50/50">
                   <td className={'py-2 px-4'}>
                     <Typography
                       variant="small"
-                      color="white"
+                      color="blue-gray"
                       className="font-normal"
                     >
                       {name}
@@ -88,7 +88,7 @@ function Ranking() {
                   <td className={'py-2 px-4'}>
                     <Typography
                       variant="small"
-                      color="white"
+                      color="blue-gray"
                       className="font-normal"
                     >
                       {rank}
@@ -97,7 +97,7 @@ function Ranking() {
                   <td className={'py-2 px-4'}>
                     <Typography
                       variant="small"
-                      color="white"
+                      color="blue-gray"
                       className="font-normal"
                     >
                       {win}
@@ -106,7 +106,7 @@ function Ranking() {
                   <td className={'py-2 px-4'}>
                     <Typography
                       variant="small"
-                      color="white"
+                      color="blue-gray"
                       className="font-normal"
                     >
                       {lose}
@@ -115,7 +115,7 @@ function Ranking() {
                   <td className={'py-2 px-4'}>
                     <Typography
                       variant="small"
-                      color="white"
+                      color="blue-gray"
                       className="font-normal"
                     >
                       {matchLeft}
@@ -124,7 +124,7 @@ function Ranking() {
                   <td className={'py-2 px-4'}>
                     <Typography
                       variant="small"
-                      color="white"
+                      color="blue-gray"
                       className="font-normal"
                     >
                       {totalPlayed}
