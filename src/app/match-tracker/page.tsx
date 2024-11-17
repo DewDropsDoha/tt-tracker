@@ -186,6 +186,9 @@ function MatchTracker() {
       try {
         setIsUploading(true);
         await axios.post('/api/match', body);
+        setMatches((prevMatches) =>
+          prevMatches.filter((match) => match !== selectedMatch)
+        );
         setResetCountdown(3);
       } catch (error) {
         console.log('Error', error);
