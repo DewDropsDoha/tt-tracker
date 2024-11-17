@@ -207,7 +207,7 @@ function MatchTracker() {
   return (
     <div className="flex items-center justify-center mt-4">
       <div className="rounded-lg shadow-2xl p-8 text-center overflow-hidden">
-        <div className="text-xl pb-4">Match Score Tracker</div>
+        <div className="text-xl pb-4">Match Tracker</div>
 
         <div className="h-12">
           {!isMatchActive && !winnerMessage && (
@@ -257,7 +257,7 @@ function MatchTracker() {
               {!resetCountdown && winnerMessage && (
                 <button
                   onClick={uploadScore}
-                  className="bg-green-600 text-white w-full font-semibold py-2 px-6 my-2 rounded-md shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  className="bg-green-600 text-white w-full py-2 px-6 my-2 rounded shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
                   {!isUploading && <>Upload Score</>}
                   {isUploading && (
@@ -272,7 +272,7 @@ function MatchTracker() {
               )}
 
               {resetCountdown !== 0 && winnerMessage && (
-                <div className="bg-green-600 text-white w-full py-2 px-6 my-2 rounded-md shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed">
+                <div className="bg-green-600 text-white w-full py-2 px-6 my-2 rounded shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed">
                   <p>
                     Uploaded successfully! <br />
                     Resetting in{' '}
@@ -294,7 +294,7 @@ function MatchTracker() {
             }}
           >
             <div
-              className="flex-1 text-center rounded-md cursor-pointer h-[144px] min-w-[120px] text-white"
+              className="flex-1 text-center rounded cursor-pointer h-[144px]  text-white"
               style={{ backgroundColor: playerColors.player1 }}
               onClick={handleScore1}
             >
@@ -306,19 +306,8 @@ function MatchTracker() {
               <div className="pt-2 text-5xl font-bold">{score1}</div>
               <div className="pt-4 text-xl font-bold">{player1}</div>
             </div>
-            {!isMatchActive && !winnerMessage && (
-              <div
-                className="flex items-center justify-center"
-                onClick={switchPlayerSide}
-              >
-                <div className="cursor-pointer">
-                  <FaArrowCircleLeft />
-                  <FaArrowCircleRight />
-                </div>
-              </div>
-            )}
             <div
-              className="flex-1 text-center rounded-md cursor-pointer h-[144px] min-w-[120px] text-white"
+              className="flex-1 text-center rounded cursor-pointer h-[144px]  text-white"
               style={{ backgroundColor: playerColors.player2 }}
               onClick={handleScore2}
             >
@@ -333,9 +322,21 @@ function MatchTracker() {
           </div>
 
           <div className="h-12">
-            {!isMatchActive && (
+            {!isMatchActive && !winnerMessage && (
+              <div
+                className="flex items-center justify-center pt-4"
+                onClick={switchPlayerSide}
+              >
+                <div className="cursor-pointer flex items-center space-x-2">
+                  <FaArrowCircleRight color={playerColors.player1} />
+                  <FaArrowCircleLeft color={playerColors.player2} />
+                </div>
+              </div>
+            )}
+
+            {isMatchActive && (
               <div>
-                {player1Stats[serve.length - 1] === 1 && (
+                {player1Stats[player1Stats.length - 1] === 1 && (
                   <div className="flex justify-start items-center p-2.5">
                     <FaMinusSquare
                       size={28}
@@ -348,7 +349,7 @@ function MatchTracker() {
                   </div>
                 )}
 
-                {player2Stats[serve.length - 1] === 1 && (
+                {player2Stats[player2Stats.length - 1] === 1 && (
                   <div className="flex justify-end items-center p-2.5">
                     <FaMinusSquare
                       size={28}
@@ -369,14 +370,14 @@ function MatchTracker() {
           <button
             onClick={resetMatch}
             disabled={!isMatchActive && !winnerMessage}
-            className="bg-red-600 text-white font-semibold py-2 px-6 rounded-md shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="bg-red-600 text-white py-2 px-6 rounded shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             Reset Match
           </button>
           <button
             onClick={startMatch}
             disabled={isMatchActive || !!winnerMessage}
-            className="bg-green-600 text-white font-semibold py-2 px-6 rounded-md shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="bg-green-600 text-white py-2 px-6 rounded shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             Start Match
           </button>
