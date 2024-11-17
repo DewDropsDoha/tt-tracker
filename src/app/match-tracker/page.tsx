@@ -206,7 +206,7 @@ function MatchTracker() {
 
   return (
     <div className="flex items-center justify-center mt-4">
-      <div className="rounded-lg shadow-2xl p-8 text-center overflow-hidden">
+      <div className="rounded-lg shadow-2xl p-4 sm:p-8 text-center min-w-[320px] sm:min-w-[420px] overflow-hidden">
         <div className="text-xl pb-4">Match Tracker</div>
 
         <div className="h-12">
@@ -366,20 +366,20 @@ function MatchTracker() {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-8 justify-center my-4">
+        <div className="flex flex-wrap gap-8 justify-between my-4">
           <button
             onClick={resetMatch}
             disabled={!isMatchActive && !winnerMessage}
-            className="bg-red-600 text-white py-2 px-6 rounded shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="w-28 bg-red-600 text-white py-2 px-6 rounded shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            Reset Match
+            Reset
           </button>
           <button
             onClick={startMatch}
             disabled={isMatchActive || !!winnerMessage}
-            className="bg-green-600 text-white py-2 px-6 rounded shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="w-28 bg-green-600 text-white py-2 px-6 rounded shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            Start Match
+            Start
           </button>
         </div>
 
