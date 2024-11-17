@@ -375,6 +375,4 @@ function MatchTracker() {
   );
 }
 
-export default withPageAuthRequired(MatchTracker, {
-  returnTo: '/',
-});
+export default withPageAuthRequired(MatchTracker);
