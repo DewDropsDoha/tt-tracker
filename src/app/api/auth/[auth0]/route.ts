@@ -6,6 +6,7 @@ export const GET = await handleAuth({
   login: handleLogin({
     authorizationParams: {
       audience: process.env.AUTH0_AUDIENCE,
+      redirect_uri: process.env.AUTH0_BASE_URL,
     },
     // returnTo: '/',
   }),
