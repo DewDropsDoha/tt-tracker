@@ -175,7 +175,7 @@ export function TableTennisNavbar() {
   );
 
   return (
-    <Navbar className="sticky h-max max-w-full rounded-none px-4 py-2 lg:px-8 lg:py-4">
+    <Navbar className="sticky h-max max-w-full bg-gray-200 rounded-none px-4 py-2 lg:px-8 lg:py-4">
       <div className="flex items-center justify-between text-black">
         <div className="mr-4 cursor-pointer py-1.5 lg:ml-2 text-xl">
           <Link href="/" passHref>
