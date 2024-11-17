@@ -54,7 +54,9 @@ function TrackerMenu() {
           </Typography>
         </MenuHandler>
         <MenuList className="hidden rounded-xl lg:block text-black">
-          <MenuItem>Single</MenuItem>
+          <MenuItem>
+            <Link href="/match-tracker">Single</Link>
+          </MenuItem>
           <MenuItem>Single Quarterfinal</MenuItem>
           <MenuItem>Single Semifinal</MenuItem>
           <MenuItem>Single Final</MenuItem>
@@ -166,7 +168,9 @@ export function TableTennisNavbar() {
     <Navbar className="sticky h-max max-w-full rounded-none px-4 py-2 lg:px-8 lg:py-4">
       <div className="flex items-center justify-between text-black">
         <div className="mr-4 cursor-pointer py-1.5 lg:ml-2 text-xl">
-          Table Tennis Match Tracker
+          <Link href="/" passHref>
+            <span>Table Tennis Match Tracker</span>
+          </Link>
         </div>
         <div className="hidden lg:block ml-auto">
           <NavList />
