@@ -18,7 +18,7 @@ export default function RootLayout({
       <UserProvider>
         <body>
           <Navbar />
-          <div className="p-4">{children}</div>
+          <div className="p-8">{children}</div>
         </body>
       </UserProvider>
     </html>
