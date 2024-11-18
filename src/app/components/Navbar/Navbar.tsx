@@ -18,9 +18,26 @@ import {
 } from './../MTailwind';
 import { FaChevronDown, FaBars } from 'react-icons/fa';
 
+const menuItems = [
+  { label: 'Single', type: 'single' },
+  { label: 'Single Quarterfinal', type: 'single-quarterfinal' },
+  { label: 'Single Semifinal', type: 'single-semifinal' },
+  { label: 'Single Final', type: 'single-final' },
+  { label: 'Double', type: 'double' },
+  { label: 'Double Semifinal', type: 'double-semifinal' },
+  { label: 'Double Final', type: 'double-final' },
+];
+
 function TrackerMenu({ closeMobileNav }: { closeMobileNav: () => void }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const renderMenuItems = () =>
+    menuItems.map(({ label, type }) => (
+      <MenuItem key={type} onClick={closeMobileNav} className={`text-sm`}>
+        <Link href={`/match-tracker?type=${type}`}>{label}</Link>
+      </MenuItem>
+    ));
 
   return (
     <Fragment>
@@ -54,29 +71,11 @@ function TrackerMenu({ closeMobileNav }: { closeMobileNav: () => void }) {
           </Typography>
         </MenuHandler>
         <MenuList className="hidden rounded-xl lg:block text-black">
-          <MenuItem onClick={closeMobileNav}>
-            <Link href="/match-tracker">Single</Link>
-          </MenuItem>
-          <MenuItem onClick={closeMobileNav}>Single Quarterfinal</MenuItem>
-          <MenuItem onClick={closeMobileNav}>Single Semifinal</MenuItem>
-          <MenuItem onClick={closeMobileNav}>Single Final</MenuItem>
-          <MenuItem onClick={closeMobileNav}>Double</MenuItem>
-          <MenuItem onClick={closeMobileNav}>Double Semifinal</MenuItem>
-          <MenuItem onClick={closeMobileNav}>Double Final</MenuItem>
+          {renderMenuItems()}
         </MenuList>
       </Menu>
       <div className="block lg:hidden text-black">
-        <Collapse open={isMobileMenuOpen}>
-          <MenuItem onClick={closeMobileNav}>
-            <Link href="/match-tracker">Single</Link>
-          </MenuItem>
-          <MenuItem onClick={closeMobileNav}>Single Quarterfinal</MenuItem>
-          <MenuItem onClick={closeMobileNav}>Single Semifinal</MenuItem>
-          <MenuItem onClick={closeMobileNav}>Single Final</MenuItem>
-          <MenuItem onClick={closeMobileNav}>Double</MenuItem>
-          <MenuItem onClick={closeMobileNav}>Double Semifinal</MenuItem>
-          <MenuItem onClick={closeMobileNav}>Double Final</MenuItem>
-        </Collapse>
+        <Collapse open={isMobileMenuOpen}>{renderMenuItems()}</Collapse>
       </div>
     </Fragment>
   );

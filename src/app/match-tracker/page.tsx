@@ -3,6 +3,7 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
+import { useSearchParams } from 'next/navigation';
 import {
   FaTableTennis,
   FaMinusSquare,
@@ -15,6 +16,8 @@ import ReactSelect from '../components/ReactSelect/ReactSelect';
 import MatchTimer from '../components/Timer';
 
 function MatchTracker() {
+  const searchParams = useSearchParams();
+  const [matchType, setMatchType] = useState('');
   const [player1, setPlayer1] = useState('');
   const [player2, setPlayer2] = useState('');
   const [score1, setScore1] = useState(0);
@@ -44,9 +47,15 @@ function MatchTracker() {
   };
 
   useEffect(() => {
+    const type = searchParams.get('type') ?? 'single';
+    setMatchType(type);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!matchType) return;
     const getRemainingMatches = async () => {
       try {
-        const resp = await axios.get('/api/match');
+        const resp = await axios.get(`/api/match?type=${matchType}`);
         setMatches(resp.data);
         setIsLoading(false);
       } catch (error) {
@@ -55,7 +64,7 @@ function MatchTracker() {
       }
     };
     getRemainingMatches();
-  }, []);
+  }, [matchType]);
 
   const startMatch = () => {
     if (!player1 && !player1) {
@@ -181,7 +190,7 @@ function MatchTracker() {
   };
 
   const uploadScore = () => {
-    const body = [player1Stats, player2Stats];
+    const body = { type: matchType, data: [player1Stats, player2Stats] };
     const uploadScore = async () => {
       try {
         setIsUploading(true);

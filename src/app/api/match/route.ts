@@ -15,6 +15,41 @@ const gcpAuth = new GoogleAuth({
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
+const matchSheetNameMap = {
+  single: ['player!A2:A1000', 'single!A2:Z1000'],
+  'single-quarterfinal': [
+    'single_quarter_player!A2:A1000',
+    'single_quarter_match!A2:Z1000',
+  ],
+  'single-semifinal': [
+    'single_semi_player!A2:A1000',
+    'single_semi_match!A2:Z1000',
+  ],
+  'single-final': [
+    'single_final_player!A2:A1000',
+    'single_final_match!A2:Z1000',
+  ],
+  double: ['double_player!A2:A1000', 'double_match!A2:Z1000'],
+  'double-semifinal': [
+    'double_semi_player!A2:A1000',
+    'double_semi_match!A2:Z1000',
+  ],
+  'double-final': [
+    'double_final_player!A2:A1000',
+    'double_final_match!A2:Z1000',
+  ],
+};
+
+const appendSheetNameMap = {
+  single: 'single',
+  'single-quarterfinal': 'single_quarter_match',
+  'single-semifinal': 'single_semi_match',
+  'single-final': 'single_final_match',
+  double: 'double_match',
+  'double-semifinal': 'double_semi_match',
+  'double-final': 'double_final_match',
+};
+
 function addEmptyRows(data: MatchData[]) {
   return data.reduce<MatchData[]>((acc, item, index) => {
     if (index % 2 === 0) acc.push([]);
@@ -23,12 +58,17 @@ function addEmptyRows(data: MatchData[]) {
   }, []);
 }
 
-const getMatches = async () => {
+const getMatches = async (request: Request) => {
+  const url = new URL(request.url);
+  const params = new URLSearchParams(url.search);
+  const type = params.get('type') as keyof typeof matchSheetNameMap;
+  if (!type) return NextResponse.json('Match type missing!', { status: 400 });
+
   try {
     const service = google.sheets({ version: 'v4', auth: gcpAuth });
     const response = await service.spreadsheets.values.batchGet({
       spreadsheetId: process.env.SPREADSHEET_ID,
-      ranges: ['player!A2:A1000', 'single!A2:Z1000'],
+      ranges: matchSheetNameMap[type],
     });
 
     const players = response.data.valueRanges?.[0].values ?? [];
@@ -66,7 +106,6 @@ const getMatches = async () => {
 };
 
 const appendMatch = async (request: Request) => {
-  // return NextResponse.json({ message: 'TESTING' }, { status: 200 });
   try {
     const requiredPermissions = ['write:table_tennis_score'];
     const permissions = await getUserPermissions();
@@ -79,23 +118,25 @@ const appendMatch = async (request: Request) => {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const newData = await request.json();
-    if (!Array.isArray(newData)) {
+    const body = await request.json();
+    const { type, data } = body;
+    if (!type && !Array.isArray(data)) {
       return NextResponse.json(
         { message: 'Invalid Request Body' },
         { status: 400 }
       );
     }
 
-    const sheetName = 'single_ranking';
-    const data = addEmptyRows(newData);
+    const sheetName =
+      appendSheetNameMap[type as keyof typeof appendSheetNameMap];
+    const values = addEmptyRows(data);
     const service = google.sheets({ version: 'v4', auth: gcpAuth });
     // @ts-expect-error There's more in service.spreadsheets.values
     const response = await service.spreadsheets.values.append({
       spreadsheetId: process.env.SPREADSHEET_ID,
       range: `${sheetName}`,
       valueInputOption: 'RAW',
-      resource: { values: data },
+      resource: { values: values },
     });
 
     const spreadsheet = await service.spreadsheets.get({
