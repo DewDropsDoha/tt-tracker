@@ -150,7 +150,7 @@ function NavList({ closeMobileNav }: { closeMobileNav: () => void }) {
 }
 
 export function TableTennisNavbar() {
-  const { user } = useUser();
+  const { user, isLoading } = useUser();
   const [openNav, setOpenNav] = useState(false);
 
   useEffect(() => {
@@ -162,51 +162,56 @@ export function TableTennisNavbar() {
 
   const closeMobileNav = () => setOpenNav(false);
 
-  const AuthButton = user ? (
-    <Link href="/api/auth/logout">
-      <Button variant="outlined" size="sm" fullWidth>
-        Log Out
-      </Button>
-    </Link>
-  ) : (
-    <Link href="/api/auth/login">
-      <Button variant="outlined" size="sm" fullWidth>
-        Log In
-      </Button>
-    </Link>
-  );
+  const AuthButton =
+    !isLoading && user ? (
+      <Link href="/api/auth/logout">
+        <Button variant="outlined" size="sm" fullWidth>
+          Log Out
+        </Button>
+      </Link>
+    ) : (
+      <Link href="/api/auth/login">
+        <Button variant="outlined" size="sm" fullWidth>
+          Log In
+        </Button>
+      </Link>
+    );
 
   return (
-    <Navbar className="sticky h-max max-w-full bg-gray-200 rounded-none px-4 py-2 lg:px-8 lg:py-4">
-      <div className="flex items-center justify-between text-black">
-        <div className="mr-4 cursor-pointer py-1.5 lg:ml-2 text-xl">
-          <Link href="/" passHref>
-            <span>Table Tennis Match Tracker</span>
-          </Link>
-        </div>
-        <div className="hidden lg:block ml-auto">
-          <NavList closeMobileNav={closeMobileNav} />
-        </div>
-        <div className="hidden gap-2 lg:flex">{AuthButton}</div>
-        <IconButton
-          variant="text"
-          className="lg:hidden"
-          onClick={() => setOpenNav(!openNav)}
-        >
-          {openNav ? (
-            <FaBars className="h-6 w-6" strokeWidth={2} />
-          ) : (
-            <FaBars className="h-6 w-6" strokeWidth={2} />
-          )}
-        </IconButton>
-      </div>
-      <Collapse open={openNav}>
-        <NavList closeMobileNav={closeMobileNav} />
-        <div className="flex w-full flex-nowrap items-center gap-2 lg:hidden">
-          {AuthButton}
-        </div>
-      </Collapse>
-    </Navbar>
+    <div>
+      {!isLoading && (
+        <Navbar className="sticky h-max max-w-full bg-gray-200 rounded-none px-4 py-2 lg:px-8 lg:py-4">
+          <div className="flex items-center justify-between text-black">
+            <div className="mr-4 cursor-pointer py-1.5 lg:ml-2 text-xl">
+              <Link href="/" passHref>
+                <span>Table Tennis Match Tracker</span>
+              </Link>
+            </div>
+            <div className="hidden lg:block ml-auto">
+              <NavList closeMobileNav={closeMobileNav} />
+            </div>
+            <div className="hidden gap-2 lg:flex">{AuthButton}</div>
+            <IconButton
+              variant="text"
+              className="lg:hidden"
+              onClick={() => setOpenNav(!openNav)}
+            >
+              {openNav ? (
+                <FaBars className="h-6 w-6" strokeWidth={2} />
+              ) : (
+                <FaBars className="h-6 w-6" strokeWidth={2} />
+              )}
+            </IconButton>
+          </div>
+          <Collapse open={openNav}>
+            <NavList closeMobileNav={closeMobileNav} />
+            <div className="flex w-full flex-nowrap items-center gap-2 lg:hidden">
+              {AuthButton}
+            </div>
+          </Collapse>
+        </Navbar>
+      )}
+    </div>
   );
 }
 export default TableTennisNavbar;
