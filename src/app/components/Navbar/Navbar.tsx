@@ -100,9 +100,11 @@ function TrackerMenu({ closeMobileNav }: { closeMobileNav: () => void }) {
 
   const renderMenuItems = () =>
     menuItems.map(({ label, type }) => (
-      <MenuItem key={type} onClick={closeMobileNav} className={`text-sm`}>
-        <Link href={`/match-tracker?type=${type}`}>{label}</Link>
-      </MenuItem>
+      <Link key={type} href={`/match-tracker?type=${type}`} passHref>
+        <MenuItem onClick={closeMobileNav} className={`text-sm`}>
+          {label}
+        </MenuItem>
+      </Link>
     ));
 
   return (
