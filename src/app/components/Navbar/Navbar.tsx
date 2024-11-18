@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import React, { Fragment, useEffect, useState } from 'react';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { UserProfile, useUser } from '@auth0/nextjs-auth0/client';
 import {
   Navbar,
   Collapse,
@@ -15,8 +15,9 @@ import {
   MenuHandler,
   MenuList,
   MenuItem,
+  Avatar,
 } from './../MTailwind';
-import { FaChevronDown, FaBars } from 'react-icons/fa';
+import { FaChevronDown, FaBars, FaSignOutAlt, FaUser } from 'react-icons/fa';
 
 const menuItems = [
   { label: 'Single', type: 'single' },
@@ -27,6 +28,71 @@ const menuItems = [
   { label: 'Double Semifinal', type: 'double-semifinal' },
   { label: 'Double Final', type: 'double-final' },
 ];
+
+function ProfileMenu({ user }: { user: UserProfile }) {
+  const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const { nickname, name, email } = user;
+
+  const closeMenu = () => setIsMenuOpen(false);
+
+  return (
+    <Menu
+      open={isMenuOpen}
+      handler={setIsMenuOpen}
+      placement="bottom-end"
+      allowHover={true}
+    >
+      <MenuHandler>
+        <Button
+          variant="text"
+          color="blue-gray"
+          className="flex items-center gap-1 rounded-full py-0.5 pr-2 pl-0.5 lg:ml-auto"
+        >
+          <Avatar
+            variant="circular"
+            size="sm"
+            alt="tania andrew"
+            className="border border-gray-900 p-0.5"
+            src={user.picture ?? 'favicon.ico'}
+          />
+          <FaChevronDown
+            strokeWidth={2.5}
+            className={`h-3 w-3 transition-transform ${
+              isMenuOpen ? 'rotate-180' : ''
+            }`}
+          />
+        </Button>
+      </MenuHandler>
+      <MenuList className="p-1">
+        <MenuItem key={'name'} className={`flex items-center gap-2 rounded}`}>
+          <FaUser className="h-4 w-4" strokeWidth={2} />
+          <Typography as="span" variant="small" className="font-normal">
+            Welcome, <br /> {nickname ?? name ?? email ?? ''}
+          </Typography>
+        </MenuItem>
+
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+        <a href="/api/auth/logout">
+          <MenuItem
+            key={'logout'}
+            onClick={closeMenu}
+            className={`flex items-center gap-2 rounded hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10}`}
+          >
+            <FaSignOutAlt className="h-4 w-4 text-red-500" strokeWidth={2} />
+            <Typography
+              as="span"
+              variant="small"
+              className="font-normal"
+              color={'red'}
+            >
+              Logout
+            </Typography>
+          </MenuItem>
+        </a>
+      </MenuList>
+    </Menu>
+  );
+}
 
 function TrackerMenu({ closeMobileNav }: { closeMobileNav: () => void }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -163,12 +229,7 @@ export function TableTennisNavbar() {
 
   const AuthButton =
     !isLoading && user ? (
-      // eslint-disable-next-line @next/next/no-html-link-for-pages
-      <a href="/api/auth/logout">
-        <Button variant="outlined" size="sm" fullWidth>
-          Log Out
-        </Button>
-      </a>
+      <ProfileMenu user={user} />
     ) : (
       // eslint-disable-next-line @next/next/no-html-link-for-pages
       <a href="/api/auth/login">
