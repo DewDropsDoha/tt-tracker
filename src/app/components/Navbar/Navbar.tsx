@@ -164,17 +164,19 @@ export function TableTennisNavbar() {
 
   const AuthButton =
     !isLoading && user ? (
-      <Link href="/api/auth/logout">
+      // eslint-disable-next-line @next/next/no-html-link-for-pages
+      <a href="/api/auth/logout">
         <Button variant="outlined" size="sm" fullWidth>
           Log Out
         </Button>
-      </Link>
+      </a>
     ) : (
-      <Link href="/api/auth/login">
+      // eslint-disable-next-line @next/next/no-html-link-for-pages
+      <a href="/api/auth/login">
         <Button variant="outlined" size="sm" fullWidth>
           Log In
         </Button>
-      </Link>
+      </a>
     );
 
   return (
