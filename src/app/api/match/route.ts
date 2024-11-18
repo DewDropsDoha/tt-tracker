@@ -87,7 +87,7 @@ const appendMatch = async (request: Request) => {
       );
     }
 
-    const sheetName = 'single_ranking';
+    const sheetName = 'single';
     const data = addEmptyRows(newData);
     const service = google.sheets({ version: 'v4', auth: gcpAuth });
     // @ts-expect-error There's more in service.spreadsheets.values
