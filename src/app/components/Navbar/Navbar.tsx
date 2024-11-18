@@ -82,63 +82,63 @@ function TrackerMenu({ closeMobileNav }: { closeMobileNav: () => void }) {
   );
 }
 
-function RankingMenu({ closeMobileNav }: { closeMobileNav: () => void }) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+// function RankingMenu({ closeMobileNav }: { closeMobileNav: () => void }) {
+//   const [isMenuOpen, setIsMenuOpen] = useState(false);
+//   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  return (
-    <Fragment>
-      <Menu
-        open={isMenuOpen}
-        handler={setIsMenuOpen}
-        placement="bottom"
-        allowHover={true}
-      >
-        <MenuHandler>
-          <Typography as="div" variant="small" className="font-medium">
-            <ListItem
-              className="flex items-center gap-2 py-2 pr-4 font-medium text-black bg-transparent"
-              selected={isMenuOpen || isMobileMenuOpen}
-              onClick={() => setIsMobileMenuOpen((cur) => !cur)}
-            >
-              Ranking
-              <FaChevronDown
-                strokeWidth={2.5}
-                className={`hidden h-3 w-3 transition-transform lg:block ${
-                  isMenuOpen ? 'rotate-180' : ''
-                }`}
-              />
-              <FaChevronDown
-                strokeWidth={2.5}
-                className={`block h-3 w-3 transition-transform lg:hidden ${
-                  isMobileMenuOpen ? 'rotate-180' : ''
-                }`}
-              />
-            </ListItem>
-          </Typography>
-        </MenuHandler>
-        <MenuList className="hidden rounded-xl lg:block text-black">
-          <MenuItem onClick={closeMobileNav}>
-            <Link href="/">Single</Link>
-          </MenuItem>
-          <MenuItem onClick={closeMobileNav}>
-            <Link href="/">Double</Link>
-          </MenuItem>
-        </MenuList>
-      </Menu>
-      <div className="block lg:hidden text-black">
-        <Collapse open={isMobileMenuOpen}>
-          <MenuItem onClick={closeMobileNav}>
-            <Link href="/">Single</Link>
-          </MenuItem>
-          <MenuItem onClick={closeMobileNav}>
-            <Link href="/">Double</Link>
-          </MenuItem>
-        </Collapse>
-      </div>
-    </Fragment>
-  );
-}
+//   return (
+//     <Fragment>
+//       <Menu
+//         open={isMenuOpen}
+//         handler={setIsMenuOpen}
+//         placement="bottom"
+//         allowHover={true}
+//       >
+//         <MenuHandler>
+//           <Typography as="div" variant="small" className="font-medium">
+//             <ListItem
+//               className="flex items-center gap-2 py-2 pr-4 font-medium text-black bg-transparent"
+//               selected={isMenuOpen || isMobileMenuOpen}
+//               onClick={() => setIsMobileMenuOpen((cur) => !cur)}
+//             >
+//               Ranking
+//               <FaChevronDown
+//                 strokeWidth={2.5}
+//                 className={`hidden h-3 w-3 transition-transform lg:block ${
+//                   isMenuOpen ? 'rotate-180' : ''
+//                 }`}
+//               />
+//               <FaChevronDown
+//                 strokeWidth={2.5}
+//                 className={`block h-3 w-3 transition-transform lg:hidden ${
+//                   isMobileMenuOpen ? 'rotate-180' : ''
+//                 }`}
+//               />
+//             </ListItem>
+//           </Typography>
+//         </MenuHandler>
+//         <MenuList className="hidden rounded-xl lg:block text-black">
+//           <MenuItem onClick={closeMobileNav}>
+//             <Link href="/">Single</Link>
+//           </MenuItem>
+//           <MenuItem onClick={closeMobileNav}>
+//             <Link href="/">Double</Link>
+//           </MenuItem>
+//         </MenuList>
+//       </Menu>
+//       <div className="block lg:hidden text-black">
+//         <Collapse open={isMobileMenuOpen}>
+//           <MenuItem onClick={closeMobileNav}>
+//             <Link href="/">Single</Link>
+//           </MenuItem>
+//           <MenuItem onClick={closeMobileNav}>
+//             <Link href="/">Double</Link>
+//           </MenuItem>
+//         </Collapse>
+//       </div>
+//     </Fragment>
+//   );
+// }
 
 function NavList({ closeMobileNav }: { closeMobileNav: () => void }) {
   return (
