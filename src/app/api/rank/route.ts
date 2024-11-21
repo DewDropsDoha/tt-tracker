@@ -124,7 +124,10 @@ const getRanks = async (): Promise<NextResponse> => {
     }
 
     const sortedRanking = sortRankingV2(rank);
-    return NextResponse.json(sortedRanking);
+    return NextResponse.json(sortedRanking, {
+      status: 200,
+      headers: { 'Cache-Control': 'no-store' },
+    });
   } catch (error) {
     console.error('Failed to show ranking data:', error);
     return NextResponse.json('Failed to show ranking data', { status: 500 });
