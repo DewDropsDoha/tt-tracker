@@ -1,3 +1,5 @@
+export const fetchCache = 'force-no-store';
+
 import { GoogleAuth } from 'google-auth-library';
 import { google } from 'googleapis';
 import { NextResponse } from 'next/server';
