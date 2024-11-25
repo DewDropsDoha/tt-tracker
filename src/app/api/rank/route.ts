@@ -94,8 +94,9 @@ const sortRankingV2 = (rank: Rank): Player[] => {
   return players;
 };
 
-const getRanks = async (): Promise<NextResponse> => {
+const getRanks = async (request: Request): Promise<NextResponse> => {
   try {
+    new URL(request.url);
     const rank: Rank = {};
     const currentScores = await getCurrentScores();
     if (!currentScores) return NextResponse.json([]);
