@@ -1,12 +1,13 @@
-'use client';
+"use client";
 
-import axios from 'axios';
-import { useEffect, useState } from 'react';
-import Loading from '../match-tracker/Loading';
-import { Card, Typography } from '@material-tailwind/react';
+import { Card, Typography } from "@material-tailwind/react";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import Loading from "../match-tracker/Loading";
 
 type PlayerRow = {
   name: string;
+  wf: string;
   win: number;
   lose: number;
   rank: number;
@@ -19,22 +20,23 @@ function Ranking() {
   const [tableRows, setTableRows] = useState<PlayerRow[]>([]);
 
   const tableHeaders = [
-    'Name',
-    'Rank',
-    'Win',
-    'Lose',
-    'Match Left',
-    'Total Played',
+    "Name",
+    "Rank",
+    "Wf",
+    "Win",
+    "Lose",
+    "Match Left",
+    "Total Played",
   ];
 
   useEffect(() => {
     const getRanking = async () => {
       try {
-        const resp = await axios.get('/api/rank');
+        const resp = await axios.get("/api/rank");
         setTableRows(resp?.data ?? []);
         setIsLoading(false);
       } catch (error) {
-        console.log('Error', error);
+        console.log("Error", error);
         setTableRows([]);
       }
     };
@@ -73,9 +75,9 @@ function Ranking() {
           </thead>
           <tbody>
             {tableRows.map(
-              ({ name, rank, win, lose, matchLeft, totalPlayed }) => (
+              ({ name, rank, wf, win, lose, matchLeft, totalPlayed }) => (
                 <tr key={name} className="even:bg-blue-gray-50/50">
-                  <td className={'py-2 px-4'}>
+                  <td className={"py-2 px-4"}>
                     <Typography
                       variant="small"
                       color="blue-gray"
@@ -84,7 +86,7 @@ function Ranking() {
                       {name}
                     </Typography>
                   </td>
-                  <td className={'py-2 px-4'}>
+                  <td className={"py-2 px-4"}>
                     <Typography
                       variant="small"
                       color="blue-gray"
@@ -93,7 +95,16 @@ function Ranking() {
                       {rank}
                     </Typography>
                   </td>
-                  <td className={'py-2 px-4'}>
+                  <td className={"py-2 px-4"}>
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-normal"
+                    >
+                      {wf}
+                    </Typography>
+                  </td>
+                  <td className={"py-2 px-4"}>
                     <Typography
                       variant="small"
                       color="blue-gray"
@@ -102,7 +113,7 @@ function Ranking() {
                       {win}
                     </Typography>
                   </td>
-                  <td className={'py-2 px-4'}>
+                  <td className={"py-2 px-4"}>
                     <Typography
                       variant="small"
                       color="blue-gray"
@@ -111,7 +122,7 @@ function Ranking() {
                       {lose}
                     </Typography>
                   </td>
-                  <td className={'py-2 px-4'}>
+                  <td className={"py-2 px-4"}>
                     <Typography
                       variant="small"
                       color="blue-gray"
@@ -120,7 +131,7 @@ function Ranking() {
                       {matchLeft}
                     </Typography>
                   </td>
-                  <td className={'py-2 px-4'}>
+                  <td className={"py-2 px-4"}>
                     <Typography
                       variant="small"
                       color="blue-gray"
