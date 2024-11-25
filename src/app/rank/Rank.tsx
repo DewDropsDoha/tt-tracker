@@ -31,6 +31,7 @@ function Ranking() {
     const getRanking = async () => {
       try {
         const resp = await axios.get('/api/rank');
+        console.log("Rank", resp.data)
         setTableRows(resp?.data ?? []);
         setIsLoading(false);
       } catch (error) {
