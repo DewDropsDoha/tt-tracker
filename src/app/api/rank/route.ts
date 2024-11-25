@@ -1,6 +1,6 @@
-import { GoogleAuth } from "google-auth-library";
-import { google } from "googleapis";
-import { NextResponse } from "next/server";
+import { GoogleAuth } from 'google-auth-library';
+import { google } from 'googleapis';
+import { NextResponse } from 'next/server';
 
 type Rank = {
   [index: string]: {
@@ -22,15 +22,15 @@ type Player = {
 const gcpAuth = new GoogleAuth({
   credentials: {
     client_email: process.env.CLIENT_EMAIL,
-    private_key: process.env.PRIVATE_KEY?.split(String.raw`\n`).join("\n"),
+    private_key: process.env.PRIVATE_KEY?.split(String.raw`\n`).join('\n'),
     project_id: process.env.PROJECT_ID,
   },
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
 const getCurrentScores = async () => {
-  const sheetName = "single";
-  const service = google.sheets({ version: "v4", auth: gcpAuth });
+  const sheetName = 'single';
+  const service = google.sheets({ version: 'v4', auth: gcpAuth });
   const response = await service.spreadsheets.values.get({
     spreadsheetId: process.env.SPREADSHEET_ID,
     range: `${sheetName}!A2:Z1000`,
@@ -101,13 +101,12 @@ const sortRankingV2 = (rank: Rank): Player[] => {
 const isNegative = (nu: number) => nu < 0;
 
 const getWf = (index: string, rank: Rank, diff: number) => {
-  const penalti = 1.5 
+  const penalti = 1.5;
   const wf = rank[index]?.wf;
   const newDiff = isNegative(diff) ? diff * penalti : diff;
   if (wf) return wf + newDiff;
   return newDiff;
 };
-
 
 const getRanks = async (request: Request): Promise<NextResponse> => {
   try {
@@ -146,8 +145,8 @@ const getRanks = async (request: Request): Promise<NextResponse> => {
     const sortedRanking = sortRankingV2(rank);
     return NextResponse.json(sortedRanking, { status: 200 });
   } catch (error) {
-    console.error("Failed to show ranking data:", error);
-    return NextResponse.json("Failed to show ranking data", { status: 500 });
+    console.error('Failed to show ranking data:', error);
+    return NextResponse.json('Failed to show ranking data', { status: 500 });
   }
 };
 
