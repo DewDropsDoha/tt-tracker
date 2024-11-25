@@ -126,6 +126,7 @@ const getRanks = async (): Promise<NextResponse> => {
     }
 
     const sortedRanking = sortRankingV2(rank);
+    console.log('Sorted Ranking', sortedRanking);
     return NextResponse.json(sortedRanking, {
       status: 200,
       headers: { 'Cache-Control': 'no-store' },
