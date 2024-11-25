@@ -1,12 +1,11 @@
-import { GoogleAuth } from "google-auth-library";
-import { google } from "googleapis";
-import { NextResponse } from "next/server";
+import { GoogleAuth } from 'google-auth-library';
+import { google } from 'googleapis';
+import { NextResponse } from 'next/server';
 
 type Rank = {
   [index: string]: {
     win: number;
     lose: number;
-    wf?: number;
   };
 };
 
@@ -22,15 +21,15 @@ type Player = {
 const gcpAuth = new GoogleAuth({
   credentials: {
     client_email: process.env.CLIENT_EMAIL,
-    private_key: process.env.PRIVATE_KEY?.split(String.raw`\n`).join("\n"),
+    private_key: process.env.PRIVATE_KEY,
     project_id: process.env.PROJECT_ID,
   },
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
 const getCurrentScores = async () => {
-  const sheetName = "single";
-  const service = google.sheets({ version: "v4", auth: gcpAuth });
+  const sheetName = 'single';
+  const service = google.sheets({ version: 'v4', auth: gcpAuth });
   const response = await service.spreadsheets.values.get({
     spreadsheetId: process.env.SPREADSHEET_ID,
     range: `${sheetName}!A2:Z1000`,
@@ -70,22 +69,16 @@ const sortRankingV2 = (rank: Rank): Player[] => {
     name,
     win: stats.win,
     lose: stats.lose || 0,
-    wf: stats.wf,
     rank: 0,
     totalPlayed: 0,
     matchLeft: 0,
   }));
 
   players.sort((a, b) => {
-    if (b.win !== a.win) {
-      return b.win - a.win;
-    }
-    // If wins are the same, compare by losses (fewer losses ranked first)
-    if (a.lose !== b.lose) {
+    if (b.win === a.win) {
       return a.lose - b.lose;
     }
-    // If both wins and losses are the same, compare by wf (higher wf ranked first)
-    return (b.wf || 0) - (a.wf || 0);
+    return b.win - a.win;
   });
 
   const noOfPlayers = players.length;
@@ -98,16 +91,6 @@ const sortRankingV2 = (rank: Rank): Player[] => {
 
   return players;
 };
-const isNegative = (nu: number) => nu < 0;
-
-const getWf = (index: string, rank: Rank, diff: number) => {
-  const penalti = 1.5 
-  const wf = rank[index]?.wf;
-  const newDiff = isNegative(diff) ? diff * penalti : diff;
-  if (wf) return wf + newDiff;
-  return newDiff;
-};
-
 
 const getRanks = async (request: Request): Promise<NextResponse> => {
   try {
@@ -127,7 +110,6 @@ const getRanks = async (request: Request): Promise<NextResponse> => {
         win: isWin(sc1, sc2)
           ? incWinCount(index1, rank)
           : getWinCount(index1, rank),
-        wf: getWf(index1, rank, sc1 - sc2),
         lose: isWin(sc1, sc2)
           ? getLoseCount(index1, rank)
           : incLoseCount(index1, rank),
@@ -136,7 +118,6 @@ const getRanks = async (request: Request): Promise<NextResponse> => {
         win: isWin(sc2, sc1)
           ? incWinCount(index2, rank)
           : getWinCount(index2, rank),
-        wf: getWf(index2, rank, sc2 - sc1),
         lose: isWin(sc2, sc1)
           ? getLoseCount(index2, rank)
           : incLoseCount(index2, rank),
@@ -146,8 +127,8 @@ const getRanks = async (request: Request): Promise<NextResponse> => {
     const sortedRanking = sortRankingV2(rank);
     return NextResponse.json(sortedRanking, { status: 200 });
   } catch (error) {
-    console.error("Failed to show ranking data:", error);
-    return NextResponse.json("Failed to show ranking data", { status: 500 });
+    console.error('Failed to show ranking data:', error);
+    return NextResponse.json('Failed to show ranking data', { status: 500 });
   }
 };
 
