@@ -30,10 +30,7 @@ function Ranking() {
   useEffect(() => {
     const getRanking = async () => {
       try {
-        const resp = await axios.get('/api/rank', {
-          headers: { 'Cache-Control': 'no-cache' },
-        });
-        console.log('Rank', resp.data);
+        const resp = await axios.get('/api/rank');
         setTableRows(resp?.data ?? []);
         setIsLoading(false);
       } catch (error) {

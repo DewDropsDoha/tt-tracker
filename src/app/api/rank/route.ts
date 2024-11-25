@@ -1,5 +1,3 @@
-export const fetchCache = 'force-no-store';
-
 import { GoogleAuth } from 'google-auth-library';
 import { google } from 'googleapis';
 import { NextResponse } from 'next/server';
@@ -127,11 +125,7 @@ const getRanks = async (request: Request): Promise<NextResponse> => {
     }
 
     const sortedRanking = sortRankingV2(rank);
-    console.log('Sorted Ranking', sortedRanking);
-    return NextResponse.json(sortedRanking, {
-      status: 200,
-      headers: { 'Cache-Control': 'no-store' },
-    });
+    return NextResponse.json(sortedRanking, { status: 200 });
   } catch (error) {
     console.error('Failed to show ranking data:', error);
     return NextResponse.json('Failed to show ranking data', { status: 500 });
