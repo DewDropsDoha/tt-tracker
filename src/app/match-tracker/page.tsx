@@ -1,53 +1,53 @@
-'use client';
+"use client";
 
-import axios from 'axios';
-import { useEffect, useState } from 'react';
-import { withPageAuthRequired } from '@auth0/nextjs-auth0/client';
-import { useSearchParams } from 'next/navigation';
+import { withPageAuthRequired } from "@auth0/nextjs-auth0/client";
+import axios from "axios";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
-  FaTableTennis,
-  FaMinusSquare,
   FaArrowCircleLeft,
   FaArrowCircleRight,
-} from 'react-icons/fa';
-import Loading from './Loading';
-import CountdownTimer from './CountdownTimer';
-import ReactSelect from '../components/ReactSelect/ReactSelect';
-import MatchTimer from '../components/Timer';
+  FaMinusSquare,
+  FaTableTennis,
+} from "react-icons/fa";
+import ReactSelect from "../components/ReactSelect/ReactSelect";
+import MatchTimer from "../components/Timer";
+import CountdownTimer from "./CountdownTimer";
+import Loading from "./Loading";
 
 function MatchTracker() {
   const searchParams = useSearchParams();
-  const [matchType, setMatchType] = useState('');
-  const [player1, setPlayer1] = useState('');
-  const [player2, setPlayer2] = useState('');
+  const [matchType, setMatchType] = useState("");
+  const [player1, setPlayer1] = useState("");
+  const [player2, setPlayer2] = useState("");
   const [score1, setScore1] = useState(0);
   const [score2, setScore2] = useState(0);
   const [player1Stats, setPlayer1Stats] = useState<(string | number)[]>([]);
   const [player2Stats, setPlayer2Stats] = useState<(string | number)[]>([]);
   const [isMatchActive, setIsMatchActive] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [winnerMessage, setWinnerMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [winnerMessage, setWinnerMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [matches, setMatches] = useState<string[]>([]);
-  const [selectedMatch, setSelectedMatch] = useState('');
+  const [selectedMatch, setSelectedMatch] = useState("");
   const [resetCountdown, setResetCountdown] = useState(0);
   const [serve, setServe] = useState([1]);
 
   const playerColors = {
-    player1: '#3B82F6',
-    player2: '#7AB2D3',
+    player1: "#3B82F6",
+    player2: "#7AB2D3",
   };
 
   const handleMatchSelection = (value: string) => {
     setSelectedMatch(value);
-    const players = value.split('vs');
+    const players = value.split("vs");
     setPlayer1(players[0]?.trim());
     setPlayer2(players[1]?.trim());
   };
 
   useEffect(() => {
-    const type = searchParams.get('type') ?? 'single';
+    const type = searchParams.get("type") ?? "single";
     setMatchType(type);
   }, [searchParams]);
 
@@ -59,8 +59,8 @@ function MatchTracker() {
         setMatches(resp.data);
         setIsLoading(false);
       } catch (error) {
-        console.log('Error', error);
-        setErrorMessage('Error fetching matches!');
+        console.log("Error", error);
+        setErrorMessage("Error fetching matches!");
       }
     };
     getRemainingMatches();
@@ -68,7 +68,7 @@ function MatchTracker() {
 
   const startMatch = () => {
     if (!player1 && !player1) {
-      setErrorMessage('Select Match!');
+      setErrorMessage("Select Match!");
       return;
     }
 
@@ -77,22 +77,22 @@ function MatchTracker() {
     setPlayer1Stats([player1]);
     setPlayer2Stats([player2]);
     setIsMatchActive(true);
-    setWinnerMessage('');
-    setErrorMessage('');
+    setWinnerMessage("");
+    setErrorMessage("");
     setResetCountdown(0);
   };
 
   const resetMatch = () => {
-    setPlayer1('');
-    setPlayer2('');
+    setPlayer1("");
+    setPlayer2("");
     setScore1(0);
     setScore2(0);
     setPlayer1Stats([]);
     setPlayer2Stats([]);
     setIsMatchActive(false);
-    setWinnerMessage('');
-    setErrorMessage('');
-    setSelectedMatch('');
+    setWinnerMessage("");
+    setErrorMessage("");
+    setSelectedMatch("");
     setResetCountdown(0);
   };
 
@@ -185,8 +185,8 @@ function MatchTracker() {
       .slice(1)
       .reduce((acc, value) => Number(acc) + Number(value), 0);
 
-    setPlayer1Stats((prev) => [prev[0], player1Sum, '-', ...prev.slice(1)]);
-    setPlayer2Stats((prev) => [prev[0], player2Sum, '-', ...prev.slice(1)]);
+    setPlayer1Stats((prev) => [prev[0], player1Sum, "-", ...prev.slice(1)]);
+    setPlayer2Stats((prev) => [prev[0], player2Sum, "-", ...prev.slice(1)]);
   };
 
   const uploadScore = () => {
@@ -194,14 +194,14 @@ function MatchTracker() {
     const uploadScore = async () => {
       try {
         setIsUploading(true);
-        await axios.post('/api/match', body);
+        await axios.post("/api/match", body);
         setMatches((prevMatches) =>
           prevMatches.filter((match) => match !== selectedMatch)
         );
         setResetCountdown(3);
       } catch (error) {
-        console.log('Error', error);
-        setErrorMessage('Upload failed! Try again!');
+        console.log("Error", error);
+        setErrorMessage("Upload failed! Try again!");
       } finally {
         setIsUploading(false);
       }
@@ -215,8 +215,7 @@ function MatchTracker() {
         <Loading />
       </div>
     );
-
-  return (
+  const scoreBox = () => (
     <div className="flex items-center justify-center mt-4">
       <div className="rounded-lg shadow-2xl p-4 sm:p-8 text-center min-w-[320px] sm:min-w-[420px] overflow-hidden">
         <div className="text-xl pb-4">Match Tracker</div>
@@ -247,8 +246,8 @@ function MatchTracker() {
               <div className="text-green-600 text-xl font-bold pb-2">
                 {winnerMessage}
               </div>
-              <div style={{ overflowX: 'auto', width: '100%' }}>
-                <table style={{ width: '100%', paddingBottom: '8px' }}>
+              <div style={{ overflowX: "auto", width: "100%" }}>
+                <table style={{ width: "100%", paddingBottom: "8px" }}>
                   <thead>
                     <tr style={{ color: playerColors.player1 }}>
                       {player1Stats.map((item, index) => (
@@ -274,7 +273,7 @@ function MatchTracker() {
                   {!isUploading && <>Upload Score</>}
                   {isUploading && (
                     <div>
-                      Uploading Score ...{' '}
+                      Uploading Score ...{" "}
                       <div className="mt-2">
                         <Loading />
                       </div>
@@ -287,11 +286,11 @@ function MatchTracker() {
                 <div className="bg-green-600 text-white w-full py-2 px-6 my-2 rounded shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed">
                   <p>
                     Uploaded successfully! <br />
-                    Resetting in{' '}
+                    Resetting in{" "}
                     <CountdownTimer
                       countdown={resetCountdown}
                       onFinish={resetMatch}
-                    />{' '}
+                    />{" "}
                     seconds ...
                   </p>
                 </div>
@@ -312,7 +311,7 @@ function MatchTracker() {
             >
               <div className="flex items-center justify-center pt-2 h-8">
                 {serve[serve.length - 1] === 1 && (
-                  <FaTableTennis size={24} style={{ color: 'red' }} />
+                  <FaTableTennis size={24} style={{ color: "red" }} />
                 )}
               </div>
               <div className="pt-2 text-5xl font-bold">{score1}</div>
@@ -325,7 +324,7 @@ function MatchTracker() {
             >
               <div className="flex items-center justify-center pt-2 h-8">
                 {serve[serve.length - 1] === 2 && (
-                  <FaTableTennis size={24} style={{ color: 'red' }} />
+                  <FaTableTennis size={24} style={{ color: "red" }} />
                 )}
               </div>
               <div className="pt-2 text-5xl font-bold">{score2}</div>
@@ -354,7 +353,7 @@ function MatchTracker() {
                       size={28}
                       style={{
                         color: playerColors.player1,
-                        paddingBottom: '4px',
+                        paddingBottom: "4px",
                       }}
                       onClick={handleDecreaseScore1}
                     />
@@ -367,7 +366,7 @@ function MatchTracker() {
                       size={28}
                       style={{
                         color: playerColors.player2,
-                        paddingBottom: '4px',
+                        paddingBottom: "4px",
                       }}
                       onClick={handleDecreaseScore2}
                     />
@@ -395,10 +394,13 @@ function MatchTracker() {
           </button>
         </div>
 
-        <p style={{ color: 'red', fontWeight: 'bold' }}>{errorMessage ?? ''}</p>
+        <p style={{ color: "red", fontWeight: "bold" }}>{errorMessage ?? ""}</p>
       </div>
     </div>
   );
+
+  return scoreBox();
 }
 
 export default withPageAuthRequired(MatchTracker);
+
