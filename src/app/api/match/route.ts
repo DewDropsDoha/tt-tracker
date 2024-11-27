@@ -85,7 +85,7 @@ const getCount = (playedMatch: string, dif: number) => {
   };
 };
 
-export const getMatchesV2 = async (type: keyof typeof matchSheetNameMap) => {
+const getMatchesV2 = async (type: keyof typeof matchSheetNameMap) => {
   try {
     const service = google.sheets({ version: "v4", auth: gcpAuth });
     const response = await service.spreadsheets.values.batchGet({
@@ -133,6 +133,7 @@ export const getMatchesV2 = async (type: keyof typeof matchSheetNameMap) => {
     return NextResponse.json("Error fetching data");
   }
 };
+
 const getMatchesV1 = async (type: keyof typeof matchSheetNameMap) => {
   try {
     const service = google.sheets({ version: "v4", auth: gcpAuth });
