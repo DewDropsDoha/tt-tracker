@@ -50,6 +50,16 @@ const appendSheetNameMap = {
   'double-final': 'double_final_match',
 };
 
+const matchSetCount = {
+  single: 1,
+  'single-quarterfinal': 3,
+  'single-semifinal': 3,
+  'single-final': 3,
+  double: 3,
+  'double-semifinal': 3,
+  'double-final': 3,
+};
+
 function addEmptyRows(data: MatchData[]) {
   return data.reduce<MatchData[]>((acc, item, index) => {
     if (index % 2 === 0) acc.push([]);
@@ -82,19 +92,42 @@ const getMatches = async (request: Request) => {
       }
     }
 
-    const playedMatchSet = new Set();
-    for (let i = 0; i < playedMatches.length - 1; i++) {
-      if (playedMatches[i].length && playedMatches[i + 1].length) {
-        const player1 = playedMatches[i][0];
-        const player2 = playedMatches[i + 1][0];
-        const playedMatch = [player1, player2].sort().join(' vs ');
-        playedMatchSet.add(playedMatch);
+    if (type === 'single') {
+      const playedMatchSet = new Set();
+      for (let i = 0; i < playedMatches.length - 1; i++) {
+        if (playedMatches[i].length && playedMatches[i + 1].length) {
+          const player1 = playedMatches[i][0];
+          const player2 = playedMatches[i + 1][0];
+          const playedMatch = [player1, player2].sort().join(' vs ');
+          playedMatchSet.add(playedMatch);
+        }
       }
-    }
 
-    playedMatchSet.forEach((match) => {
-      matchSet.delete(match);
-    });
+      playedMatchSet.forEach((match) => {
+        matchSet.delete(match);
+      });
+    } else {
+      const matchCountMap: Record<string, number> = {};
+      for (let i = 0; i < playedMatches.length - 1; i++) {
+        if (playedMatches[i].length && playedMatches[i + 1].length) {
+          const player1 = playedMatches[i][0];
+          const player2 = playedMatches[i + 1][0];
+          const match = [player1, player2].sort().join(' vs ');
+          matchCountMap[match] = (matchCountMap[match] || 0) + 1;
+        }
+      }
+
+      const playedMatchSet = new Set<string>();
+      Object.entries(matchCountMap).forEach(([match, count]) => {
+        if (count === matchSetCount[type]) {
+          playedMatchSet.add(match);
+        }
+      });
+
+      playedMatchSet.forEach((match) => {
+        matchSet.delete(match);
+      });
+    }
 
     const remainingMatches = Array.from(matchSet).sort();
 
