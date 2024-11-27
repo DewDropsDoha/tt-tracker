@@ -1,63 +1,53 @@
-import { GoogleAuth } from 'google-auth-library';
-import { google } from 'googleapis';
-import { NextResponse } from 'next/server';
-import { withApiAuthRequired } from '@auth0/nextjs-auth0';
-import { getUserPermissions } from '../shared/auth0';
+import { withApiAuthRequired } from "@auth0/nextjs-auth0";
+import { GoogleAuth } from "google-auth-library";
+import { google } from "googleapis";
+import { NextResponse } from "next/server";
+import { getUserPermissions } from "../shared/auth0";
 
 type MatchData = (string | number)[];
 
 const gcpAuth = new GoogleAuth({
   credentials: {
     client_email: process.env.CLIENT_EMAIL,
-    private_key: process.env.PRIVATE_KEY,
+    private_key: process.env.PRIVATE_KEY?.split(String.raw`\n`).join("\n"),
     project_id: process.env.PROJECT_ID,
   },
-  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 
 const matchSheetNameMap = {
-  single: ['player!A2:A1000', 'single!A2:Z1000'],
-  'single-quarterfinal': [
-    'single_quarter_player!A2:A1000',
-    'single_quarter_match!A2:Z1000',
+  single: ["player!A2:A1000", "single!A2:Z1000"],
+  "single-quarterfinal": [
+    "single_quarter_player!A2:A1000",
+    "single_quarter_match!A2:Z1000",
   ],
-  'single-semifinal': [
-    'single_semi_player!A2:A1000',
-    'single_semi_match!A2:Z1000',
+  "single-semifinal": [
+    "single_semi_player!A2:A1000",
+    "single_semi_match!A2:Z1000",
   ],
-  'single-final': [
-    'single_final_player!A2:A1000',
-    'single_final_match!A2:Z1000',
+  "single-final": [
+    "single_final_player!A2:A1000",
+    "single_final_match!A2:Z1000",
   ],
-  double: ['double_player!A2:A1000', 'double_match!A2:Z1000'],
-  'double-semifinal': [
-    'double_semi_player!A2:A1000',
-    'double_semi_match!A2:Z1000',
+  double: ["double_player!A2:A1000", "double_match!A2:Z1000"],
+  "double-semifinal": [
+    "double_semi_player!A2:A1000",
+    "double_semi_match!A2:Z1000",
   ],
-  'double-final': [
-    'double_final_player!A2:A1000',
-    'double_final_match!A2:Z1000',
+  "double-final": [
+    "double_final_player!A2:A1000",
+    "double_final_match!A2:Z1000",
   ],
 };
 
 const appendSheetNameMap = {
-  single: 'single',
-  'single-quarterfinal': 'single_quarter_match',
-  'single-semifinal': 'single_semi_match',
-  'single-final': 'single_final_match',
-  double: 'double_match',
-  'double-semifinal': 'double_semi_match',
-  'double-final': 'double_final_match',
-};
-
-const matchSetCount = {
-  single: 1,
-  'single-quarterfinal': 3,
-  'single-semifinal': 3,
-  'single-final': 3,
-  double: 3,
-  'double-semifinal': 3,
-  'double-final': 3,
+  single: "single",
+  "single-quarterfinal": "single_quarter_match",
+  "single-semifinal": "single_semi_match",
+  "single-final": "single_final_match",
+  double: "double_match",
+  "double-semifinal": "double_semi_match",
+  "double-final": "double_final_match",
 };
 
 function addEmptyRows(data: MatchData[]) {
@@ -68,14 +58,36 @@ function addEmptyRows(data: MatchData[]) {
   }, []);
 }
 
-const getMatches = async (request: Request) => {
-  const url = new URL(request.url);
-  const params = new URLSearchParams(url.search);
-  const type = params.get('type') as keyof typeof matchSheetNameMap;
-  if (!type) return NextResponse.json('Match type missing!', { status: 400 });
+const areBothSameSign = (num1: number, num2: number) => {
+  return (num1 > 0 && num2 > 0) || (num1 < 0 && num2 < 0);
+};
 
+const count: Record<string, { dif: number; noOfMatch: number }> = {};
+const getCount = (playedMatch: string, dif: number) => {
+  if (count[playedMatch]) {
+    if (count[playedMatch].dif) {
+      if (areBothSameSign(count[playedMatch].dif, dif))
+        return {
+          dif,
+          noOfMatch: count[playedMatch].noOfMatch + 2,
+        };
+      else
+        return {
+          dif,
+          noOfMatch: count[playedMatch].noOfMatch + 1,
+        };
+    }
+  }
+
+  return {
+    dif,
+    noOfMatch: 1,
+  };
+};
+
+export const getMatchesV2 = async (type: keyof typeof matchSheetNameMap) => {
   try {
-    const service = google.sheets({ version: 'v4', auth: gcpAuth });
+    const service = google.sheets({ version: "v4", auth: gcpAuth });
     const response = await service.spreadsheets.values.batchGet({
       spreadsheetId: process.env.SPREADSHEET_ID,
       ranges: matchSheetNameMap[type],
@@ -87,75 +99,113 @@ const getMatches = async (request: Request) => {
     const matchSet = new Set();
     for (let i = 0; i < players.length; i++) {
       for (let j = i + 1; j < players.length; j++) {
-        const match = [players[i][0], players[j][0]].sort().join(' vs ');
+        const match = [players[i][0], players[j][0]].sort().join(" vs ");
         matchSet.add(match);
       }
     }
 
-    if (type === 'single') {
-      const playedMatchSet = new Set();
-      for (let i = 0; i < playedMatches.length - 1; i++) {
-        if (playedMatches[i].length && playedMatches[i + 1].length) {
-          const player1 = playedMatches[i][0];
-          const player2 = playedMatches[i + 1][0];
-          const playedMatch = [player1, player2].sort().join(' vs ');
-          playedMatchSet.add(playedMatch);
-        }
+    const playedMatchSet = new Set();
+
+    for (let i = 0; i < playedMatches.length - 1; i++) {
+      if (playedMatches[i].length && playedMatches[i + 1].length) {
+        const player1 = playedMatches[i][0];
+        const player2 = playedMatches[i + 1][0];
+        const playedMatch = [player1, player2].sort().join(" vs ");
+
+        count[playedMatch] = getCount(
+          playedMatch,
+          Number(playedMatches[i][1]) - Number(playedMatches[i + 1][1])
+        );
+
+        playedMatchSet.add(playedMatch);
       }
-
-      playedMatchSet.forEach((match) => {
-        matchSet.delete(match);
-      });
-    } else {
-      const matchCountMap: Record<string, number> = {};
-      for (let i = 0; i < playedMatches.length - 1; i++) {
-        if (playedMatches[i].length && playedMatches[i + 1].length) {
-          const player1 = playedMatches[i][0];
-          const player2 = playedMatches[i + 1][0];
-          const match = [player1, player2].sort().join(' vs ');
-          matchCountMap[match] = (matchCountMap[match] || 0) + 1;
-        }
-      }
-
-      const playedMatchSet = new Set<string>();
-      Object.entries(matchCountMap).forEach(([match, count]) => {
-        if (count === matchSetCount[type]) {
-          playedMatchSet.add(match);
-        }
-      });
-
-      playedMatchSet.forEach((match) => {
-        matchSet.delete(match);
-      });
     }
+
+    playedMatchSet.forEach((match) => {
+      if (count[match as string].noOfMatch >= 3) matchSet.delete(match);
+    });
 
     const remainingMatches = Array.from(matchSet).sort();
 
     return NextResponse.json(remainingMatches);
   } catch (error) {
-    console.error('Error fetching data:', error);
-    return NextResponse.json('Error fetching data');
+    console.error("Error fetching data:", error);
+    return NextResponse.json("Error fetching data");
   }
+};
+const getMatchesV1 = async (type: keyof typeof matchSheetNameMap) => {
+  try {
+    const service = google.sheets({ version: "v4", auth: gcpAuth });
+    const response = await service.spreadsheets.values.batchGet({
+      spreadsheetId: process.env.SPREADSHEET_ID,
+      ranges: matchSheetNameMap[type],
+    });
+
+    const players = response.data.valueRanges?.[0].values ?? [];
+    const playedMatches = response.data.valueRanges?.[1].values ?? [];
+
+    const matchSet = new Set();
+    for (let i = 0; i < players.length; i++) {
+      for (let j = i + 1; j < players.length; j++) {
+        const match = [players[i][0], players[j][0]].sort().join(" vs ");
+        matchSet.add(match);
+      }
+    }
+
+    const playedMatchSet = new Set();
+    for (let i = 0; i < playedMatches.length - 1; i++) {
+      if (playedMatches[i].length && playedMatches[i + 1].length) {
+        const player1 = playedMatches[i][0];
+        const player2 = playedMatches[i + 1][0];
+        const playedMatch = [player1, player2].sort().join(" vs ");
+        playedMatchSet.add(playedMatch);
+      }
+    }
+
+    playedMatchSet.forEach((match) => {
+      matchSet.delete(match);
+    });
+
+    const remainingMatches = Array.from(matchSet).sort();
+
+    return NextResponse.json(remainingMatches);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    return NextResponse.json("Error fetching data");
+  }
+};
+
+const getMatches = async (request: Request) => {
+  const url = new URL(request.url);
+  const params = new URLSearchParams(url.search);
+  const type = params.get("type") as keyof typeof matchSheetNameMap;
+  if (!type) return NextResponse.json("Match type missing!", { status: 400 });
+
+  if (type === "double") {
+    return getMatchesV2(type as keyof typeof matchSheetNameMap);
+  }
+
+  return getMatchesV1(type as keyof typeof matchSheetNameMap);
 };
 
 const appendMatch = async (request: Request) => {
   try {
-    const requiredPermissions = ['write:table_tennis_score'];
+    const requiredPermissions = ["write:table_tennis_score"];
     const permissions = await getUserPermissions();
     const hasAllPermissions = requiredPermissions.every((permission) =>
       permissions.includes(permission)
     );
 
     if (!hasAllPermissions) {
-      console.log('User does not have all required permissions.');
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      console.log("User does not have all required permissions.");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
     const { type, data } = body;
     if (!type && !Array.isArray(data)) {
       return NextResponse.json(
-        { message: 'Invalid Request Body' },
+        { message: "Invalid Request Body" },
         { status: 400 }
       );
     }
@@ -163,12 +213,12 @@ const appendMatch = async (request: Request) => {
     const sheetName =
       appendSheetNameMap[type as keyof typeof appendSheetNameMap];
     const values = addEmptyRows(data);
-    const service = google.sheets({ version: 'v4', auth: gcpAuth });
+    const service = google.sheets({ version: "v4", auth: gcpAuth });
     // @ts-expect-error There's more in service.spreadsheets.values
     const response = await service.spreadsheets.values.append({
       spreadsheetId: process.env.SPREADSHEET_ID,
       range: `${sheetName}`,
-      valueInputOption: 'RAW',
+      valueInputOption: "RAW",
       resource: { values: values },
     });
 
@@ -183,7 +233,7 @@ const appendMatch = async (request: Request) => {
     // @ts-expect-error There's more in response
     const updatedRange = response.data?.updates?.updatedRange;
     const startRow = parseInt(
-      updatedRange.split('!')[1].split(':')[0].replace(/[A-Z]/g, ''),
+      updatedRange.split("!")[1].split(":")[0].replace(/[A-Z]/g, ""),
       10
     );
     const nextRow = startRow + 1;
@@ -204,10 +254,10 @@ const appendMatch = async (request: Request) => {
             ],
             booleanRule: {
               condition: {
-                type: 'CUSTOM_FORMULA',
+                type: "CUSTOM_FORMULA",
                 values: [
                   {
-                    userEnteredValue: '=B' + nextRow + '>B' + next2ndRow + '',
+                    userEnteredValue: "=B" + nextRow + ">B" + next2ndRow + "",
                   },
                 ],
               },
@@ -232,10 +282,10 @@ const appendMatch = async (request: Request) => {
             ],
             booleanRule: {
               condition: {
-                type: 'CUSTOM_FORMULA',
+                type: "CUSTOM_FORMULA",
                 values: [
                   {
-                    userEnteredValue: '=B' + next2ndRow + '>B' + nextRow + '',
+                    userEnteredValue: "=B" + next2ndRow + ">B" + nextRow + "",
                   },
                 ],
               },
@@ -259,9 +309,9 @@ const appendMatch = async (request: Request) => {
     // @ts-expect-error There's more in response
     return NextResponse.json(response.data, { status: 201 });
   } catch (error) {
-    console.error('Error appending data:', error);
+    console.error("Error appending data:", error);
     return NextResponse.json(
-      { message: 'Error appending data' },
+      { message: "Error appending data" },
       { status: 500 }
     );
   }
