@@ -1,6 +1,7 @@
 import { GoogleAuth } from 'google-auth-library';
 import { google } from 'googleapis';
 import { NextResponse } from 'next/server';
+import { getRankForDouble } from './rankigForDouble';
 
 type Rank = {
   [index: string]: {
@@ -108,9 +109,8 @@ const getWf = (index: string, rank: Rank, diff: number) => {
   return newDiff;
 };
 
-const getRanks = async (request: Request): Promise<NextResponse> => {
+const getRanks = async (): Promise<NextResponse> => {
   try {
-    new URL(request.url);
     const rank: Rank = {};
     const currentScores = await getCurrentScores();
     if (!currentScores) return NextResponse.json([]);
@@ -150,4 +150,17 @@ const getRanks = async (request: Request): Promise<NextResponse> => {
   }
 };
 
-export const GET = getRanks;
+const getRankBasedOnType = async (request: Request): Promise<NextResponse> => { 
+  const url = new URL(request.url);
+  const params = new URLSearchParams(url.search);
+  const type = params.get("type") ;
+  if (!type) return NextResponse.json("Match type missing!", { status: 400 });
+
+  if (type === "double") {
+    return getRankForDouble();
+  }
+
+  return getRanks();
+}
+
+export const GET = getRankBasedOnType;
