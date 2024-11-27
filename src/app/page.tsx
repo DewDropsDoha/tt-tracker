@@ -1,6 +1,6 @@
 'use client';
 
-import Rank from './rank/Rank';
+import Rank from './rank/rankForDouble';
 
 export default function Home() {
   return (
