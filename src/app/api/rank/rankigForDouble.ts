@@ -113,9 +113,16 @@ const clearData = (): void => {
   }
 };
 
+const clearData = (): void => {
+  for (const key in data) {
+    delete data[key];
+  }
+};
+
 export const getRankForDouble = async (): Promise<NextResponse> => {
   try {
     clearData();
+
     const currentScores = await getCurrentScores();
     if (!currentScores?.length) return NextResponse.json([], { status: 200 });
 
