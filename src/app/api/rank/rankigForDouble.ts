@@ -107,9 +107,15 @@ const sortRankingForDouble = (info: Record<string, Info>): Info[] => {
 //   if (wf) return wf + newDiff;
 //   return newDiff;
 // };
+const clearData = (): void => {
+  for (const key in data) {
+    delete data[key];
+  }
+};
 
 export const getRankForDouble = async (): Promise<NextResponse> => {
   try {
+    clearData();
     const currentScores = await getCurrentScores();
     if (!currentScores?.length) return NextResponse.json([], { status: 200 });
 
@@ -156,6 +162,7 @@ export const getRankForDouble = async (): Promise<NextResponse> => {
         totalMatchPlayed +=
           data[outerKey][innerKey].win + data[outerKey][innerKey].lose;
       }
+
       info[outerKey] = {
         name: outerKey,
         seriesLose,
