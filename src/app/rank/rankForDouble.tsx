@@ -72,28 +72,42 @@ function Ranking() {
     );
   const MatchDataTable: React.FC<{ data: MatchData }> = ({ data }) => {
     return (
-      <div className="flex flex-wrap gap-2 justify-center ">
+      <div className="flex flex-wrap gap-4 justify-center">
         {Object.entries(data).map(([player, games]) => (
           <div
             key={player}
-            className="w-full sm:w-1/2 md:w-1/6 bg-white border border-gray-300 shadow-md rounded-lg p-4"
+            className="w-full sm:w-1/2 md:w-1/5 bg-white border border-gray-300 shadow-md rounded-lg p-4"
           >
             <h2 className="text-lg font-bold text-gray-800 mb-4">
               Player: {player}
             </h2>
-            <ul className="space-y-2">
-              {Object.entries(games).map(([game, stats]) => (
-                <li key={game} className="text-gray-700">
-                  <p className="font-semibold">Opponent: {game}</p>
-                  <p>
-                    Wins: <span className="text-green-600">{stats.win}</span>
-                  </p>
-                  <p>
-                    Losses: <span className="text-red-600">{stats.lose}</span>
-                  </p>
-                </li>
-              ))}
-            </ul>
+
+            {/* Table inside the Card */}
+            <table className="table-auto border-collapse w-full text-left">
+              <thead>
+                <tr className="bg-gray-200">
+                  <th className="border border-gray-300 px-4 py-2">Game</th>
+                  <th className="border border-gray-300 px-4 py-2">Wins</th>
+                  <th className="border border-gray-300 px-4 py-2">Losses</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(games).map(([game, stats], index) => (
+                  <tr
+                    key={game}
+                    className={index % 2 === 0 ? "bg-gray-100" : ""}
+                  >
+                    <td className="border border-gray-300 px-4 py-2">{game}</td>
+                    <td className="border border-gray-300 px-4 py-2 text-green-600">
+                      {stats.win}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2 text-red-600">
+                      {stats.lose}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         ))}
       </div>
@@ -102,7 +116,26 @@ function Ranking() {
 
   return (
     <div className="w-full h-full">
-      <div className="text-lg pb-4">Double 1st Round Ranking</div>
+      <div className="text-lg pb-4">
+        <h2 className="text-xl font-bold mb-4">Point System</h2>
+        <ul className="list-disc pl-6 space-y-2">
+          <li className="text-green-600">
+            +4 points if series win in 2 matches
+          </li>
+          <li className="text-green-600">
+            +2 points if series win in 3 matches
+          </li>
+          <li className="text-red-600">
+            -4 points if series lose in 2 matches
+          </li>
+          <li className="text-red-600">
+            -2 points if series lose in 3 matches
+          </li>
+        </ul>
+      </div>
+      <div className="flex justify-center items-center">
+        <div className="text-lg pb-4 text-center">Double 1st Round Ranking</div>
+      </div>
       <Card className="overflow-auto">
         <table className="w-full min-w-max table-auto text-center">
           <thead>
@@ -218,6 +251,9 @@ function Ranking() {
         </table>
       </Card>
       <br />
+      <div className="flex justify-center items-center">
+        <div className="text-lg pb-4 text-center">Match statistics</div>
+      </div>
       <MatchDataTable data={matchData} />
     </div>
   );
