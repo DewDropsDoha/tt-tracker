@@ -56,7 +56,8 @@ function MatchTracker() {
     const getRemainingMatches = async () => {
       try {
         const resp = await axios.get(`/api/match?type=${matchType}`);
-        setMatches(resp.data);
+        if (matchType === 'single') setMatches(resp.data);
+        else setMatches(resp.data.remainingMatches);
         setIsLoading(false);
       } catch (error) {
         console.log("Error", error);

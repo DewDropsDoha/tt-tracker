@@ -12,18 +12,23 @@ type PlayerRow = {
   totalSeriesPlayed: number;
   totalMatchPlayed: number;
   seriesLeft: number;
-  wf?: number;
+  points?: number;
   rank?: number;
 };
-
+interface GameStats {
+  win: number;
+  lose: number;
+}
+type MatchData = { [key: string]: { [key: string]: GameStats } };
 function Ranking() {
   const [isLoading, setIsLoading] = useState(true);
   const [tableRows, setTableRows] = useState<PlayerRow[]>([]);
+  const [matchData, setMatchData] = useState<MatchData>({});
 
   const tableHeaders = [
     "Name",
     "Rank",
-    "Wf",
+    "Points",
     "Series Win",
     "Series Lose",
     "Series Left",
@@ -45,18 +50,61 @@ function Ranking() {
     getRanking();
   }, []);
 
+  useEffect(() => {
+    const getMatchData = async () => {
+      try {
+        const resp = await axios.get(`/api/match?type=double`);
+        setMatchData(resp.data.data ?? {});
+        setIsLoading(false);
+      } catch (error) {
+        console.log("Error", error);
+        setMatchData({});
+      }
+    };
+    getMatchData();
+  }, []);
+
   if (isLoading)
     return (
       <div className="pt-8">
         <Loading />
       </div>
     );
+  const MatchDataTable: React.FC<{ data: MatchData }> = ({ data }) => {
+    return (
+      <div className="flex flex-wrap gap-2 justify-center ">
+        {Object.entries(data).map(([player, games]) => (
+          <div
+            key={player}
+            className="w-full sm:w-1/2 md:w-1/6 bg-white border border-gray-300 shadow-md rounded-lg p-4"
+          >
+            <h2 className="text-lg font-bold text-gray-800 mb-4">
+              Player: {player}
+            </h2>
+            <ul className="space-y-2">
+              {Object.entries(games).map(([game, stats]) => (
+                <li key={game} className="text-gray-700">
+                  <p className="font-semibold">Opponent: {game}</p>
+                  <p>
+                    Wins: <span className="text-green-600">{stats.win}</span>
+                  </p>
+                  <p>
+                    Losses: <span className="text-red-600">{stats.lose}</span>
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="w-full h-full">
       <div className="text-lg pb-4">Double 1st Round Ranking</div>
       <Card className="overflow-auto">
-        <table className="w-full min-w-max table-auto text-left">
+        <table className="w-full min-w-max table-auto text-center">
           <thead>
             <tr>
               {tableHeaders.map((head) => (
@@ -66,7 +114,7 @@ function Ranking() {
                 >
                   <Typography
                     variant="small"
-                    color="blue-gray"
+                    color="black"
                     className="font-normal leading-none opacity-70"
                   >
                     {head}
@@ -77,21 +125,24 @@ function Ranking() {
           </thead>
           <tbody>
             {tableRows.map(
-              ({
-                name,
-                seriesWin,
-                seriesLose,
-                totalSeriesPlayed,
-                totalMatchPlayed,
-                seriesLeft,
-                wf,
-                rank,
-              }) => (
+              (
+                {
+                  name,
+                  seriesWin,
+                  seriesLose,
+                  totalSeriesPlayed,
+                  totalMatchPlayed,
+                  seriesLeft,
+                  points,
+                  rank,
+                },
+                index
+              ) => (
                 <tr key={name} className="even:bg-blue-gray-50/50">
                   <td className={"py-2 px-4"}>
                     <Typography
                       variant="small"
-                      color="blue-gray"
+                      color={`${index < 4 ? "green" : "gray"}`}
                       className="font-normal"
                     >
                       {name}
@@ -100,7 +151,7 @@ function Ranking() {
                   <td className={"py-2 px-4"}>
                     <Typography
                       variant="small"
-                      color="blue-gray"
+                      color={`${index < 4 ? "green" : "gray"}`}
                       className="font-normal"
                     >
                       {rank}
@@ -109,16 +160,16 @@ function Ranking() {
                   <td className={"py-2 px-4"}>
                     <Typography
                       variant="small"
-                      color="blue-gray"
+                      color={`${index < 4 ? "green" : "gray"}`}
                       className="font-normal"
                     >
-                      {wf ?? 0}
+                      {points ?? 0}
                     </Typography>
                   </td>
                   <td className={"py-2 px-4"}>
                     <Typography
                       variant="small"
-                      color="blue-gray"
+                      color={`${index < 4 ? "green" : "gray"}`}
                       className="font-normal"
                     >
                       {seriesWin}
@@ -127,7 +178,7 @@ function Ranking() {
                   <td className={"py-2 px-4"}>
                     <Typography
                       variant="small"
-                      color="blue-gray"
+                      color={`${index < 4 ? "green" : "gray"}`}
                       className="font-normal"
                     >
                       {seriesLose}
@@ -136,7 +187,7 @@ function Ranking() {
                   <td className={"py-2 px-4"}>
                     <Typography
                       variant="small"
-                      color="blue-gray"
+                      color={`${index < 4 ? "green" : "gray"}`}
                       className="font-normal"
                     >
                       {seriesLeft}
@@ -145,7 +196,7 @@ function Ranking() {
                   <td className={"py-2 px-4"}>
                     <Typography
                       variant="small"
-                      color="blue-gray"
+                      color={`${index < 4 ? "green" : "gray"}`}
                       className="font-normal"
                     >
                       {totalSeriesPlayed}
@@ -154,7 +205,7 @@ function Ranking() {
                   <td className={"py-2 px-4"}>
                     <Typography
                       variant="small"
-                      color="blue-gray"
+                      color={`${index < 4 ? "green" : "gray"}`}
                       className="font-normal"
                     >
                       {totalMatchPlayed}
@@ -166,6 +217,8 @@ function Ranking() {
           </tbody>
         </table>
       </Card>
+      <br />
+      <MatchDataTable data={matchData} />
     </div>
   );
 }
