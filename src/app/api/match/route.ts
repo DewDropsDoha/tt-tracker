@@ -3,6 +3,7 @@ import { GoogleAuth } from "google-auth-library";
 import { google } from "googleapis";
 import { NextResponse } from "next/server";
 import { getUserPermissions } from "../shared/auth0";
+import { getMatchesForDouble } from "./getMatchesForDouble";
 
 type MatchData = (string | number)[];
 
@@ -15,7 +16,7 @@ const gcpAuth = new GoogleAuth({
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 
-const matchSheetNameMap = {
+export const matchSheetNameMap = {
   single: ["player!A2:A1000", "single!A2:Z1000"],
   "single-quarterfinal": [
     "single_quarter_player!A2:A1000",
@@ -57,82 +58,6 @@ function addEmptyRows(data: MatchData[]) {
     return acc;
   }, []);
 }
-
-const areBothSameSign = (num1: number, num2: number) => {
-  return (num1 > 0 && num2 > 0) || (num1 < 0 && num2 < 0);
-};
-
-const count: Record<string, { dif: number; noOfMatch: number }> = {};
-const getCount = (playedMatch: string, dif: number) => {
-  if (count[playedMatch]) {
-    if (count[playedMatch].dif) {
-      if (areBothSameSign(count[playedMatch].dif, dif))
-        return {
-          dif,
-          noOfMatch: count[playedMatch].noOfMatch + 2,
-        };
-      else
-        return {
-          dif,
-          noOfMatch: count[playedMatch].noOfMatch + 1,
-        };
-    }
-  }
-
-  return {
-    dif,
-    noOfMatch: 1,
-  };
-};
-
-const getMatchesV2 = async (type: keyof typeof matchSheetNameMap) => {
-  try {
-    const service = google.sheets({ version: "v4", auth: gcpAuth });
-    const response = await service.spreadsheets.values.batchGet({
-      spreadsheetId: process.env.SPREADSHEET_ID,
-      ranges: matchSheetNameMap[type],
-    });
-
-    const players = response.data.valueRanges?.[0].values ?? [];
-    const playedMatches = response.data.valueRanges?.[1].values ?? [];
-
-    const matchSet = new Set();
-    for (let i = 0; i < players.length; i++) {
-      for (let j = i + 1; j < players.length; j++) {
-        const match = [players[i][0], players[j][0]].sort().join(" vs ");
-        matchSet.add(match);
-      }
-    }
-
-    const playedMatchSet = new Set();
-
-    for (let i = 0; i < playedMatches.length - 1; i++) {
-      if (playedMatches[i].length && playedMatches[i + 1].length) {
-        const player1 = playedMatches[i][0];
-        const player2 = playedMatches[i + 1][0];
-        const playedMatch = [player1, player2].sort().join(" vs ");
-
-        count[playedMatch] = getCount(
-          playedMatch,
-          Number(playedMatches[i][1]) - Number(playedMatches[i + 1][1])
-        );
-
-        playedMatchSet.add(playedMatch);
-      }
-    }
-
-    playedMatchSet.forEach((match) => {
-      if (count[match as string].noOfMatch >= 3) matchSet.delete(match);
-    });
-
-    const remainingMatches = Array.from(matchSet).sort();
-
-    return NextResponse.json(remainingMatches);
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    return NextResponse.json("Error fetching data");
-  }
-};
 
 const getMatchesV1 = async (type: keyof typeof matchSheetNameMap) => {
   try {
@@ -183,7 +108,7 @@ const getMatches = async (request: Request) => {
   if (!type) return NextResponse.json("Match type missing!", { status: 400 });
 
   if (type === "double") {
-    return getMatchesV2(type as keyof typeof matchSheetNameMap);
+    return getMatchesForDouble(type as keyof typeof matchSheetNameMap);
   }
 
   return getMatchesV1(type as keyof typeof matchSheetNameMap);
