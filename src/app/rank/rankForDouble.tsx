@@ -24,6 +24,7 @@ function Ranking() {
   const [isLoading, setIsLoading] = useState(true);
   const [tableRows, setTableRows] = useState<PlayerRow[]>([]);
   const [matchData, setMatchData] = useState<MatchData>({});
+  const [remainingMatches, setRemainingMatches] = useState<string[]>([]);
 
   const tableHeaders = [
     "Name",
@@ -55,6 +56,8 @@ function Ranking() {
       try {
         const resp = await axios.get(`/api/match?type=double`);
         setMatchData(resp.data.data ?? {});
+        console.log(resp.data.remainingMatches);
+        setRemainingMatches(resp.data.remainingMatches ?? []);
         setIsLoading(false);
       } catch (error) {
         console.log("Error", error);
@@ -70,6 +73,33 @@ function Ranking() {
         <Loading />
       </div>
     );
+  const RemainingMatchList: React.FC<{ player: string }> = ({ player }) => {
+    let filteredMatches = remainingMatches.filter((data) =>
+      data.includes(player)
+    );
+
+    filteredMatches = filteredMatches.map((data) =>
+      data.replace(player, "").replace("vs", "").trim()
+    );
+    return (
+      <div>
+        <h2 className="text-lg font-bold mb-4">
+          Remaining Matches for {player}
+        </h2>
+        <ul className="list-disc pl-6 space-y-2">
+          {filteredMatches.length > 0 ? (
+            filteredMatches.map((match, index) => (
+              <li key={index} className="text-gray-800">
+                {match}
+              </li>
+            ))
+          ) : (
+            <li className="text-red-600">No matches found for {player}</li>
+          )}
+        </ul>
+      </div>
+    );
+  };
   const MatchDataTable: React.FC<{ data: MatchData }> = ({ data }) => {
     return (
       <div className="flex flex-wrap gap-4 justify-center">
@@ -81,7 +111,6 @@ function Ranking() {
             <h2 className="text-lg font-bold text-gray-800 mb-4">
               Player: {player}
             </h2>
-
             {/* Table inside the Card */}
             <table className="table-auto border-collapse w-full text-left">
               <thead>
@@ -108,6 +137,7 @@ function Ranking() {
                 ))}
               </tbody>
             </table>
+            <RemainingMatchList player={player} />
           </div>
         ))}
       </div>
