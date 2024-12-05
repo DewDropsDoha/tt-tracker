@@ -1,19 +1,20 @@
-import { GoogleAuth } from "google-auth-library";
-import { google } from "googleapis";
-import { NextResponse } from "next/server";
+import { GoogleAuth } from 'google-auth-library';
+import { google } from 'googleapis';
+import { NextResponse } from 'next/server';
 
 const gcpAuth = new GoogleAuth({
   credentials: {
     client_email: process.env.CLIENT_EMAIL,
-    private_key: process.env.PRIVATE_KEY?.split(String.raw`\n`).join("\n"),
+    private_key: process.env.PRIVATE_KEY?.split(String.raw`\n`).join('\n'),
     project_id: process.env.PROJECT_ID,
   },
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
 interface GameStats {
   win: number;
   lose: number;
+  points?: number;
 }
 
 interface Info {
@@ -23,14 +24,14 @@ interface Info {
   totalSeriesPlayed: number;
   totalMatchPlayed: number;
   seriesLeft: number;
-  wf?: number;
+  points?: number;
   rank?: number;
 }
 
 const data: { [key: string]: { [key: string]: GameStats } } = {};
 const getCurrentScores = async () => {
-  const sheetName = "double_match";
-  const service = google.sheets({ version: "v4", auth: gcpAuth });
+  const sheetName = 'double_match';
+  const service = google.sheets({ version: 'v4', auth: gcpAuth });
   const response = await service.spreadsheets.values.get({
     spreadsheetId: process.env.SPREADSHEET_ID,
     range: `${sheetName}!A2:Z1000`,
@@ -72,7 +73,7 @@ const sortRankingForDouble = (info: Record<string, Info>): Info[] => {
     name,
     seriesWin: stats.seriesWin,
     seriesLose: stats.seriesLose || 0,
-    wf: stats.wf,
+    points: stats.points,
     rank: 0,
     totalMatchPlayed: stats.totalMatchPlayed,
     totalSeriesPlayed: stats.totalSeriesPlayed,
@@ -80,15 +81,8 @@ const sortRankingForDouble = (info: Record<string, Info>): Info[] => {
   }));
 
   players.sort((a, b) => {
-    if (b.seriesWin !== a.seriesWin) {
-      return b.seriesWin - a.seriesWin;
-    }
-
-    if (a.seriesLose !== b.seriesLose) {
-      return a.seriesLose - b.seriesLose;
-    }
-
-    return (b.totalMatchPlayed || 0) - (a.totalMatchPlayed || 0);
+    if (a.points != b.points) return (b.points ?? 0) - (a.points ?? 0);
+    return (a.seriesLose ?? 0) - (b.seriesLose ?? 0);
   });
 
   players.forEach((player, index) => {
@@ -156,10 +150,15 @@ export const getRankForDouble = async (): Promise<NextResponse> => {
       let seriesLose = 0;
       let seriesWin = 0;
       let totalMatchPlayed = 0;
+      let points: number = 0;
       for (const innerKey in data[outerKey]) {
-        if (data[outerKey][innerKey].win > data[outerKey][innerKey].lose)
+        if (data[outerKey][innerKey].win > data[outerKey][innerKey].lose) {
+          points += data[outerKey][innerKey].lose === 0 ? 4 : 2;
           seriesWin++;
-        else seriesLose++;
+        } else {
+          points -= data[outerKey][innerKey].win > 0 ? 2 : 4;
+          seriesLose++;
+        }
 
         totalMatchPlayed +=
           data[outerKey][innerKey].win + data[outerKey][innerKey].lose;
@@ -171,12 +170,13 @@ export const getRankForDouble = async (): Promise<NextResponse> => {
         totalMatchPlayed,
         totalSeriesPlayed: seriesLose + seriesWin,
         seriesLeft: 7 - (seriesLose + seriesWin),
+        points,
       };
     }
     const sortedInfo = sortRankingForDouble(info);
     return NextResponse.json(sortedInfo, { status: 200 });
   } catch (error) {
-    console.error("Failed to show ranking data:", error);
-    return NextResponse.json("Failed to show ranking data", { status: 500 });
+    console.error('Failed to show ranking data:', error);
+    return NextResponse.json('Failed to show ranking data', { status: 500 });
   }
 };
