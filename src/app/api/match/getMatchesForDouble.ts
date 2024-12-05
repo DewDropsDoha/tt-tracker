@@ -1,7 +1,7 @@
 import { GoogleAuth } from 'google-auth-library';
 import { google } from 'googleapis';
 import { NextResponse } from 'next/server';
-import { matchSheetNameMap } from './route';
+import { matchSheetNameMap } from './utils';
 
 const isWin = (score1: string, score2: string): boolean =>
   Number(score1) > Number(score2);
