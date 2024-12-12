@@ -1,14 +1,14 @@
-import { GoogleAuth } from 'google-auth-library';
-import { google } from 'googleapis';
-import { NextResponse } from 'next/server';
+import { GoogleAuth } from "google-auth-library";
+import { google } from "googleapis";
+import { NextResponse } from "next/server";
 
 const gcpAuth = new GoogleAuth({
   credentials: {
     client_email: process.env.CLIENT_EMAIL,
-    private_key: process.env.PRIVATE_KEY?.split(String.raw`\n`).join('\n'),
+    private_key: process.env.PRIVATE_KEY?.split(String.raw`\n`).join("\n"),
     project_id: process.env.PROJECT_ID,
   },
-  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 });
 
 interface GameStats {
@@ -26,12 +26,15 @@ interface Info {
   seriesLeft: number;
   points?: number;
   rank?: number;
+  totalScore?: number;
 }
 
 const data: { [key: string]: { [key: string]: GameStats } } = {};
+const totalScore: { [key: string]: number } = {};
+
 const getCurrentScores = async () => {
-  const sheetName = 'double_match';
-  const service = google.sheets({ version: 'v4', auth: gcpAuth });
+  const sheetName = "double_match";
+  const service = google.sheets({ version: "v4", auth: gcpAuth });
   const response = await service.spreadsheets.values.get({
     spreadsheetId: process.env.SPREADSHEET_ID,
     range: `${sheetName}!A2:Z1000`,
@@ -78,11 +81,14 @@ const sortRankingForDouble = (info: Record<string, Info>): Info[] => {
     totalMatchPlayed: stats.totalMatchPlayed,
     totalSeriesPlayed: stats.totalSeriesPlayed,
     seriesLeft: stats.seriesLeft,
+    totalScore: stats.totalScore,
   }));
 
   players.sort((a, b) => {
     if (a.points != b.points) return (b.points ?? 0) - (a.points ?? 0);
-    return (a.seriesLose ?? 0) - (b.seriesLose ?? 0);
+    if (a.seriesLose !== b.seriesLose)
+      return (b.seriesLose ?? 0) - (a.seriesLose ?? 0);
+    return (b.totalScore ?? 0) - (a.totalScore ?? 0);
   });
 
   players.forEach((player, index) => {
@@ -106,6 +112,9 @@ const clearData = (): void => {
   for (const key in data) {
     delete data[key];
   }
+  for (const key in totalScore) {
+    delete totalScore[key];
+  }
 };
 
 export const getRankForDouble = async (): Promise<NextResponse> => {
@@ -124,7 +133,12 @@ export const getRankForDouble = async (): Promise<NextResponse> => {
       const score1 = currentScores[i][1];
       const score2 = currentScores[i + 1][1];
 
+      if (!totalScore[player1]) totalScore[player1] = 0;
+      if (!totalScore[player2]) totalScore[player2] = 0;
       if (!data[player1]) data[player1] = {};
+
+      totalScore[player1] += Number(score1);
+      totalScore[player2] += Number(score2);
 
       data[player1][player2] = {
         win: isWin(score1, score2)
@@ -171,12 +185,13 @@ export const getRankForDouble = async (): Promise<NextResponse> => {
         totalSeriesPlayed: seriesLose + seriesWin,
         seriesLeft: 7 - (seriesLose + seriesWin),
         points,
+        totalScore: totalScore[outerKey],
       };
     }
     const sortedInfo = sortRankingForDouble(info);
     return NextResponse.json(sortedInfo, { status: 200 });
   } catch (error) {
-    console.error('Failed to show ranking data:', error);
-    return NextResponse.json('Failed to show ranking data', { status: 500 });
+    console.error("Failed to show ranking data:", error);
+    return NextResponse.json("Failed to show ranking data", { status: 500 });
   }
 };
