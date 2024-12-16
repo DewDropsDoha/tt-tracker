@@ -101,6 +101,11 @@ const sortRankingForDouble = (info: Record<string, Info>): Info[] => {
 //   if (wf) return wf + newDiff;
 //   return newDiff;
 // };
+const clearData = (): void => {
+  for (const key in data) {
+    delete data[key];
+  }
+};
 
 const clearData = (): void => {
   for (const key in data) {
@@ -163,6 +168,7 @@ export const getRankForDouble = async (): Promise<NextResponse> => {
         totalMatchPlayed +=
           data[outerKey][innerKey].win + data[outerKey][innerKey].lose;
       }
+
       info[outerKey] = {
         name: outerKey,
         seriesLose,
